@@ -1,6 +1,38 @@
+import requests
+import zipfile
+import io
 import json
 from openai import OpenAI
 import streamlit as st
+import os
+
+
+
+# Execute the code snippet
+print("Running")
+
+if not os.path.exists("dataset.jsonl"):
+    url = "https://data.jobtechdev.se/annonser/historiska/2023.jsonl.zip"
+
+    try:
+        zip = requests.get(url)
+        zip.raise_for_status()
+
+        with zipfile.ZipFile(io.BytesIO(zip.content)) as zip_file:
+            file_name = zip_file.namelist()[0]
+            jsonl_file = zip_file.open(file_name)
+            print("File loaded successfully!")
+
+            # Write to the JSONL file
+            with open("dataset.jsonl", "ab") as output_file:  # Use "ab" mode to append
+                for line in jsonl_file:
+                    output_file.write(line)
+            print("JSONL data appended successfully!")
+
+    except requests.exceptions.RequestException as e:
+        print("Failed to fetch data:", e)
+    except Exception as e:
+        print("Error:", e)
 
 API_KEY = open('Open_AI_key', 'r').read()
 
@@ -8,11 +40,9 @@ client = OpenAI(
     api_key=API_KEY
 ) 
 
-# Läs innehållet från "2023.jsonl" filen
-
 def load_job_ads(file_path):
     job_ads = []
-    with open('2023.jsonl', "r", encoding='utf-8') as file:
+    with open("dataset.jsonl", "r", encoding='utf-8') as file:
         for line_number, line in enumerate(file):
             if line_number >= 100000:
                 break
@@ -22,6 +52,7 @@ def load_job_ads(file_path):
 job_ads = load_job_ads('2023.jsonl')
 
 def main():
+    print("Started sucessfully!")
     st.title("Deltid Jobbannonser")  
 
     if st.button("Visa jobbannonser som är deltidsarbete"):
