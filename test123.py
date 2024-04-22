@@ -1,1 +1,3 @@
 print('hej')
+
+print ('frids')
