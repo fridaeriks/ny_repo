@@ -61,3 +61,4 @@ chromatic.log
 chromatic-build-*.xml
 chromatic-diagnostics.json
 desktop.ini
+test1.py
