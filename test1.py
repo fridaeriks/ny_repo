@@ -1,1 +1,3 @@
 print('t')
+
+print('f')
