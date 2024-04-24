@@ -7,7 +7,7 @@ lines = []
 with open('dataset.jsonl', 'r') as file: 
     for i, line in enumerate(file):
         lines.append(line.strip())
-        if i >= 9999:
+        if i >= 99999:
             break
 
 # Convert each line from JSON format to Python dictionary
@@ -58,12 +58,12 @@ st.write('')
 places_list = subset['workplace_address.region'].unique().tolist()
 
 # Display the list of different places jobs are located
-st.write("List of Different Places Jobs are Located:")
+st.write("Region:")
 st.write(places_list)
 
 # Extract unique values from the column "working_hours_type.label"
 time_of_work = subset['working_hours_type.label'].unique().tolist()
-st.write("List of working hours type:")
+st.write("Tidsomfattning:")
 st.write(time_of_work)
 
 subset = subset.dropna(subset=['working_hours_type.label'])
