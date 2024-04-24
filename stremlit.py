@@ -7,7 +7,7 @@ lines = []
 with open('dataset.jsonl', 'r') as file: 
     for i, line in enumerate(file):
         lines.append(line.strip())
-        if i >= 99999:
+        if i >= 9999:
             break
 
 # Convert each line from JSON format to Python dictionary
