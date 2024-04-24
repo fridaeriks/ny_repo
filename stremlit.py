@@ -43,7 +43,6 @@ st.markdown("---")
 st.write(subset)
 
 #Den gråa sidopanelen
-
 left_column = st.sidebar.empty()
 
 left_column.markdown("""
@@ -82,23 +81,38 @@ st.write('')
 
 
 
+<<<<<<< Updated upstream
 
+=======
+#Region rullista
+places_list = subset['workplace_address.region'].unique().tolist()
+selected_place = st.selectbox("Välj region:", places_list)
+filtered_subset = subset[subset['workplace_address.region'] == selected_place]
+
+
+#Tidsomfattning rullista
+time_of_work = subset['working_hours_type.label'].unique().tolist()
+selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
+filtered_subset = subset[subset['working_hours_type.label'] == selected_time_of_work]
+
+>>>>>>> Stashed changes
 
 
 #Tabell där man kan filtrera med båda rullistorna
+#Också att jag ger kollumnerna alias med andra
 
 column_aliases = {
     'headline': 'Rubrik',
     'number_of_vacancies': 'Antal Lediga Platser',
     'description.text': 'Beskrivning',
     'working_hours_type.label': 'Tidsomfattning',
-    'workplace_address.region': 'Region',
-    'workplace_address.municipality': 'Kommun'}
+    'workplace_address.region': 'Kommun',
+    'workplace_address.municipality': 'Region'}
 
 places_list = subset['workplace_address.region'].unique().tolist()
 time_of_work = subset['working_hours_type.label'].unique().tolist()
-selected_place = st.selectbox("Select Region:", places_list)
-selected_time_of_work = st.selectbox("Select Time of Work:", time_of_work)
+selected_place = st.selectbox("Välj region:", places_list)
+selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
 
 filtered_subset = subset[(subset['workplace_address.region'] == selected_place) & 
                          (subset['working_hours_type.label'] == selected_time_of_work)]
