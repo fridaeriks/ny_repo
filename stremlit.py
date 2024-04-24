@@ -61,6 +61,10 @@ places_list = subset['workplace_address.region'].unique().tolist()
 st.write("List of Different Places Jobs are Located:")
 st.write(places_list)
 
+# Extract unique values from the column "working_hours_type.label"
+time_of_work = subset['working_hours_type.label'].unique().tolist()
+st.write("List of working hours type:")
+st.write(time_of_work)
 
 subset = subset.dropna(subset=['working_hours_type.label'])
 subset['working_hours_type.label'] = subset['working_hours_type.label'].apply(lambda text: text.strip())
