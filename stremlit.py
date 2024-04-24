@@ -84,9 +84,6 @@ st.write('')
 
 
 
-<<<<<<< Updated upstream
-
-=======
 #Region rullista
 places_list = subset['workplace_address.region'].unique().tolist()
 selected_place = st.selectbox("Välj region:", places_list)
@@ -98,7 +95,6 @@ time_of_work = subset['working_hours_type.label'].unique().tolist()
 selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
 filtered_subset = subset[subset['working_hours_type.label'] == selected_time_of_work]
 
->>>>>>> Stashed changes
 
 
 #Tabell där man kan filtrera med båda rullistorna
