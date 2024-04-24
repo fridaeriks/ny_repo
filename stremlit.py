@@ -4,7 +4,7 @@ import streamlit as st
 
 # Load the JSON file into a DataFrame 
 lines = []
-with open('dataset.jsonl', 'r') as file: 
+with open('dataset.jsonl', 'rb') as file: 
     for i, line in enumerate(file):
         lines.append(line.strip())
         if i >= 9999:
@@ -37,10 +37,36 @@ subset = jobtech_dataset[[
     'keywords.extracted.occupation'
 ]]
 
-# Streamlit app
-st.title('Jobtech Dataset')
-# Display the DataFrame
+#Titel och text högst upp
+st.title('Vårt namn')
+st.markdown("Info om vårt projekt")
+st.markdown("---")
 st.write(subset)
+
+#Den gråa sidopanelen
+left_column = st.sidebar.empty()
+
+left_column.markdown("""
+<style>
+.left-column {
+    background-color: #f0f0f0;
+    width: 30%;
+    padding: 20px;
+    border-radius: 5px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+left_column.markdown("""
+<div class="left-column" style="padding: 20px;">
+<h3>Filter</h3>
+<p>Här kan man lägga till text om man vill.</p>
+<hr>
+<p style="font-size: 18px;">Våra kontaktuppgifter:</p> 
+<p style="font-size: 12px;">Vera@devil.com</p> 
+                     
+</div>
+""", unsafe_allow_html=True)
 
 
 # Display description of a specific row
@@ -57,37 +83,53 @@ st.write('')
 
 
 
-# Extract unique values from the column "employer.workplace"
+
+<<<<<<< Updated upstream
+
+=======
+#Region rullista
 places_list = subset['workplace_address.region'].unique().tolist()
+selected_place = st.selectbox("Välj region:", places_list)
+filtered_subset = subset[subset['workplace_address.region'] == selected_place]
 
-# Display the list of different places jobs are located
-st.write("List of Different Places Jobs are Located:")
-st.write(places_list)
 
-# Extract unique values from the column "working_hours_type.label"
+#Tidsomfattning rullista
 time_of_work = subset['working_hours_type.label'].unique().tolist()
-st.write("List of working hours type:")
-st.write(time_of_work)
+selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
+filtered_subset = subset[subset['working_hours_type.label'] == selected_time_of_work]
 
-subset = subset.dropna(subset=['working_hours_type.label'])
-subset['working_hours_type.label'] = subset['working_hours_type.label'].apply(lambda text: text.strip())
-
-word_to_count = "deltid" 
-try:
-    subset['word_count'] = subset['working_hours_type.label'].apply(lambda text: text.lower().count(word_to_count.lower()))
-    total_word_count = subset['word_count'].sum()
-    st.write("\nTotal occurrences of '{}': {}".format(word_to_count, total_word_count))
-    st.write(' ')
-except Exception as e:
-    st.write("An error occurred:", e)
+>>>>>>> Stashed changes
 
 
+#Tabell där man kan filtrera med båda rullistorna
+#Också att jag ger kollumnerna alias med andra
+
+column_aliases = {
+    'headline': 'Rubrik',
+    'number_of_vacancies': 'Antal Lediga Platser',
+    'description.text': 'Beskrivning',
+    'working_hours_type.label': 'Tidsomfattning',
+    'workplace_address.region': 'Kommun',
+    'workplace_address.municipality': 'Region'}
+
+places_list = subset['workplace_address.region'].unique().tolist()
+time_of_work = subset['working_hours_type.label'].unique().tolist()
+selected_place = st.selectbox("Välj region:", places_list)
+selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
+
+filtered_subset = subset[(subset['workplace_address.region'] == selected_place) & 
+                         (subset['working_hours_type.label'] == selected_time_of_work)]
+
+filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'description.text', 
+                                   'working_hours_type.label', 'workplace_address.region', 
+                                   'workplace_address.municipality']]
+
+filtered_subset = filtered_subset.rename(columns=column_aliases) 
+st.write(filtered_subset)
 
 
-# Först se till att alla rader som har NaN-värden i kolumnen 'working_hours_type.label' tas bort
-subset = subset.dropna(subset=['working_hours_type.label'])
-# Filtrera rader där kolumnen 'working_hours_type.label' innehåller ordet 'deltid'
-deltid_rows = subset[subset['working_hours_type.label'].str.contains('deltid', na=False, case=False)]
-# Skriv ut de filtrerade raderna
-st.write(deltid_rows)
-#st.write("\nTotal occurrences of '{}': {}".format(word_to_count, total_word_count))
+
+
+
+
+
