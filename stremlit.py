@@ -19,7 +19,6 @@ jobtech_dataset = pd.json_normalize(data)
 #select only these columns
 subset = jobtech_dataset[[
     'id',
-    'external_id',
     'original_id',
     'headline',
     'number_of_vacancies',
@@ -27,8 +26,6 @@ subset = jobtech_dataset[[
     'driving_license_required',
     'detected_language',
     'description.text',
-    'description.conditions',
-    'salary_type.label',
     'duration.label',
     'working_hours_type.label',
     'employer.name',
@@ -58,7 +55,7 @@ st.write('')
 
 
 # Extract unique values from the column "employer.workplace"
-places_list = subset['workplace_address.municipality'].unique().tolist()
+places_list = subset['workplace_address.region'].unique().tolist()
 
 # Display the list of different places jobs are located
 st.write("List of Different Places Jobs are Located:")
