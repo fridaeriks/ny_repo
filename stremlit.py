@@ -10,6 +10,7 @@ with open('dataset.jsonl', 'rb') as file:
         if i >= 9999:
             break
 
+
 # Convert each line from JSON format to Python dictionary
 data = [json.loads(line) for line in lines]
 
@@ -73,6 +74,8 @@ row_index = st.slider("Select Row Index", 0, len(subset)-1, 25)
 st.subheader("Description for Selected Row:")
 st.write(subset['description.text'].iloc[row_index])
 
+
+
 # Show the variables in the dataset (equivalent to column names)
 st.write("Columns in the dataset:")
 st.write(subset.columns)
@@ -81,9 +84,6 @@ st.write('')
 
 
 
-<<<<<<< Updated upstream
-
-=======
 #Region rullista
 places_list = subset['workplace_address.region'].unique().tolist()
 selected_place = st.selectbox("Välj region:", places_list)
@@ -95,7 +95,6 @@ time_of_work = subset['working_hours_type.label'].unique().tolist()
 selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
 filtered_subset = subset[subset['working_hours_type.label'] == selected_time_of_work]
 
->>>>>>> Stashed changes
 
 
 #Tabell där man kan filtrera med båda rullistorna
