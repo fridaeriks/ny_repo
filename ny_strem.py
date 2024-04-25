@@ -43,8 +43,9 @@ st.markdown("Info om vårt projekt")
 st.markdown("---")
 st.write(subset)
 
-#Den gråa sidopanelen
 
+
+#Den gråa sidopanelen
 left_column = st.sidebar.empty()
 
 left_column.markdown("""
@@ -87,7 +88,6 @@ st.write('')
 
 
 #Tabell där man kan filtrera med båda rullistorna
-
 column_aliases = {
     'headline': 'Rubrik',
     'number_of_vacancies': 'Antal Lediga Platser',
@@ -96,8 +96,16 @@ column_aliases = {
     'workplace_address.region': 'Region',
     'workplace_address.municipality': 'Kommun'}
 
-places_list = subset['workplace_address.region'].unique().tolist()
-time_of_work = subset['working_hours_type.label'].unique().tolist()
+
+places_list = subset['workplace_address.region'].dropna().unique().tolist()
+if 'None' in places_list:
+    places_list.remove('None')
+
+
+time_of_work = subset['working_hours_type.label'].dropna().unique().tolist()
+if 'None' in time_of_work:
+    time_of_work.remove('None')
+
 selected_place = st.selectbox("Select Region:", places_list)
 selected_time_of_work = st.selectbox("Select Time of Work:", time_of_work)
 
