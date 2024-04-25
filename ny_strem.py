@@ -98,19 +98,28 @@ column_aliases = {
 
 
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
-if 'None' in places_list:
-    places_list.remove('None')
+places_list.insert(0, 'Visa alla')
 
 
 time_of_work = subset['working_hours_type.label'].dropna().unique().tolist()
-if 'None' in time_of_work:
-    time_of_work.remove('None')
+time_of_work.insert(0, 'Visa alla')
 
 selected_place = st.selectbox("Select Region:", places_list)
 selected_time_of_work = st.selectbox("Select Time of Work:", time_of_work)
 
-filtered_subset = subset[(subset['workplace_address.region'] == selected_place) & 
-                         (subset['working_hours_type.label'] == selected_time_of_work)]
+
+if selected_place == 'Visa alla':
+    region_condition = subset['workplace_address.region'].notna()
+else:
+    region_condition = subset['workplace_address.region'] == selected_place
+
+if selected_time_of_work == 'Visa alla':
+    time_of_work_condition = subset['working_hours_type.label'].notna()
+else:
+    time_of_work_condition = subset['working_hours_type.label'] == selected_time_of_work
+
+
+filtered_subset = subset[(region_condition) & (time_of_work_condition)]
 
 filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'description.text', 
                                    'working_hours_type.label', 'workplace_address.region', 

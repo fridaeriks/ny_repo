@@ -71,8 +71,14 @@ response = client.chat.completions.create(
 )
 
 # Hämta och skriv ut den genererade beskrivningen
-simplified_description = response.choices[0].message
-st.write(simplified_description)
+simplified_description = response.choices[0]
+
+# Extrahera beskrivningen från Choice-objektet
+description_content = simplified_description.message.content
+
+# Skriv ut den rensade beskrivningen
+st.write(description_content)
+
 
 # Show the variables in the dataset (equivalent to column names)
 st.write("Columns in the dataset:")
