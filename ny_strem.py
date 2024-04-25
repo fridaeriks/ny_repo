@@ -71,6 +71,8 @@ left_column.markdown("""
 """, unsafe_allow_html=True)
 
 
+
+
 # Display description of a specific row
 row_index = st.slider("Select Row Index", 0, len(subset)-1, 25)
 st.subheader("Description for Selected Row:")
@@ -127,14 +129,16 @@ filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'descripti
                                    'workplace_address.municipality']]
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
-st.write(filtered_subset)
-
 
 
 #TEST MED LISTAN SOM GÅR ATT KLICKA NER
+data = [json.loads(line) for line in lines]
+
+# If the JSON file has nested structures, pandas will automatically flatten them
+jobtech_dataset = pd.json_normalize(data)
 
 # Select only these columns
-ny_subset = subset[[
+subset = jobtech_dataset[[
     'headline',
     'employer.workplace',
     'description.text'
@@ -159,6 +163,13 @@ if len(selected_ads) < len(ny_subset):
 
 
 #TEST SLUTAR HÄR
+#
+#
 
 
 st.write(filtered_subset)
+
+
+st.markdown("---")
+st.subheader("Bakgrund till vårt projekt")
+st.markdown("I vårt projekt...")
