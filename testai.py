@@ -61,20 +61,12 @@ row_index = st.slider("Välj radindex", 0, len(subset)-1, 25)
 st.subheader("Beskrivning för vald rad:")
 description_text = subset['description.text'].iloc[row_index]
 
-"""# Uppmana OpenAI att generera en mer vardaglig beskrivning av beskrivningstexten
-response = openai.Completion.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
-        {"role": "user", "content": "Kan du skriva om jobbannonsen på ett mer flytande och enkelt sätt?"}
-    ]
-)"""
 
 response = client.chat.completions.create(
   model="gpt-3.5-turbo",
   messages=[
     {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
-    {"role": "user", "content": "Kan du skriva om jobbannonsen på ett mer flytande och enkelt sätt i en sammanhängande text?"},
+    {"role": "user", "content": "Kan du skriva om jobbannonsen på ett mer flytande och enkelt sätt i en sammanhängande text? Svara endast med den uppdaterade texten"},
   ]
 )
 
