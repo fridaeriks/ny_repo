@@ -71,6 +71,8 @@ left_column.markdown("""
 """, unsafe_allow_html=True)
 
 
+
+
 # Display description of a specific row
 row_index = st.slider("Select Row Index", 0, len(subset)-1, 25)
 st.subheader("Description for Selected Row:")
@@ -85,9 +87,10 @@ st.write('')
 
 
 
-
-
+#
+#
 #Tabell där man kan filtrera med båda rullistorna
+
 column_aliases = {
     'headline': 'Rubrik',
     'number_of_vacancies': 'Antal Lediga Platser',
@@ -126,4 +129,47 @@ filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'descripti
                                    'workplace_address.municipality']]
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
+
+
+#TEST MED LISTAN SOM GÅR ATT KLICKA NER
+data = [json.loads(line) for line in lines]
+
+# If the JSON file has nested structures, pandas will automatically flatten them
+jobtech_dataset = pd.json_normalize(data)
+
+# Select only these columns
+subset = jobtech_dataset[[
+    'headline',
+    'employer.workplace',
+    'description.text'
+]]
+
+# Title and text at the top
+st.subheader('Lediga jobb')
+
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['headline'])
+
+# Display the first 20 job listings
+for i in range(min(len(ny_subset), 10)):
+    if ny_subset['headline'][i] in selected_ads:
+        with st.expander(f"{subset['headline'][i]}"):
+            st.write(f"Arbetsgivare: {ny_subset['employer.workplace'][i]}")
+            st.write(f"Arbetsbeskrivning: {ny_subset['description.text'][i]}")
+
+if len(selected_ads) < len(ny_subset):
+    remaining_ads = [ad for ad in ny_subset['headline'] if ad not in selected_ads]
+    st.subheader('Övriga annonser:')
+    st.write(remaining_ads)
+
+
+#TEST SLUTAR HÄR
+#
+#
+
+
 st.write(filtered_subset)
+
+
+st.markdown("---")
+st.subheader("Bakgrund till vårt projekt")
+st.markdown("I vårt projekt...")
