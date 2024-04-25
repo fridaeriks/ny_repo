@@ -99,53 +99,66 @@ column_aliases = {
 
 
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
-if 'None' in places_list:
-    places_list.remove('None')
+places_list.insert(0, 'Visa alla')
 
 
 time_of_work = subset['working_hours_type.label'].dropna().unique().tolist()
-if 'None' in time_of_work:
-    time_of_work.remove('None')
+time_of_work.insert(0, 'Visa alla')
 
 selected_place = st.selectbox("Select Region:", places_list)
 selected_time_of_work = st.selectbox("Select Time of Work:", time_of_work)
 
-filtered_subset = subset[(subset['workplace_address.region'] == selected_place) & 
-                         (subset['working_hours_type.label'] == selected_time_of_work)]
+
+if selected_place == 'Visa alla':
+    region_condition = subset['workplace_address.region'].notna()
+else:
+    region_condition = subset['workplace_address.region'] == selected_place
+
+if selected_time_of_work == 'Visa alla':
+    time_of_work_condition = subset['working_hours_type.label'].notna()
+else:
+    time_of_work_condition = subset['working_hours_type.label'] == selected_time_of_work
+
+
+filtered_subset = subset[(region_condition) & (time_of_work_condition)]
 
 filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'description.text', 
                                    'working_hours_type.label', 'workplace_address.region', 
                                    'workplace_address.municipality']]
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
+st.write(filtered_subset)
+
 
 
 #TEST MED LISTAN SOM GÅR ATT KLICKA NER
-data = [json.loads(line) for line in lines]
-
-# If the JSON file has nested structures, pandas will automatically flatten them
-jobtech_dataset = pd.json_normalize(data)
 
 # Select only these columns
-subset = jobtech_dataset[[
+ny_subset = subset[[
     'headline',
     'employer.workplace',
     'description.text'
 ]]
 
 # Title and text at the top
-st.title('Lediga jobb')
+st.subheader('Lediga jobb')
+
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['headline'])
 
 # Display the first 20 job listings
-for i in range(min(len(subset), 20)):
-    with st.expander(f"{subset['headline'][i]}"):
-        st.write(f"Arbetsgivare: {subset['employer.workplace'][i]}")
-        st.write(f"Arbetsbeskrivning: {subset['description.text'][i]}")
+for i in range(min(len(ny_subset), 10)):
+    if ny_subset['headline'][i] in selected_ads:
+        with st.expander(f"{subset['headline'][i]}"):
+            st.write(f"Arbetsgivare: {ny_subset['employer.workplace'][i]}")
+            st.write(f"Arbetsbeskrivning: {ny_subset['description.text'][i]}")
+
+if len(selected_ads) < len(ny_subset):
+    remaining_ads = [ad for ad in ny_subset['headline'] if ad not in selected_ads]
+    st.subheader('Övriga annonser:')
+    st.write(remaining_ads)
 
 
 #TEST SLUTAR HÄR
-#
-#
 
 
 st.write(filtered_subset)
