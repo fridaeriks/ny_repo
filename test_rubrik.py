@@ -1,14 +1,10 @@
 import streamlit as st
 import pandas as pd
 import json
-import openai
 from openai import OpenAI
+import openai
 
 API_KEY = open('Open_AI_key', 'r').read()
-
-client = OpenAI(
-    api_key=API_KEY
-) 
 
 # Läs in API-nyckeln från filen
 with open("Open_AI_key", "r") as file:
@@ -24,7 +20,6 @@ with open('dataset.jsonl', 'rb') as file:
         lines.append(line.strip())
         if i >= 9999:
             break
-
 
 # Convert each line from JSON format to Python dictionary
 data = [json.loads(line) for line in lines]
@@ -56,7 +51,7 @@ subset = jobtech_dataset[[
 # För att kombinera de två kodsnuttarna:
 # Visa tabellen där användare kan filtrera med båda rullistorna
 column_aliases = {
-    'headline': 'Rubrik',
+    'headline': 'Rubrik',  # Använd 'headline' för rubriken här
     'number_of_vacancies': 'Antal Lediga Platser',
     'description.text': 'Beskrivning',
     'working_hours_type.label': 'Tidsomfattning',
@@ -78,24 +73,45 @@ filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'descripti
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 st.write(filtered_subset)
 
-# Lägg till kod för att förbättra texten i kolumnen "Rubrik" med AI
-# Loopa igenom varje rad i den filtrerade tabellen
-for index, row in filtered_subset.iterrows():
-    # Om det inte finns någon rubrik, använd beskrivningen för att generera en
-    if pd.isnull(row['Rubrik']):
-        # Generera en förenklad rubrik med AI-modellen baserat på beskrivningstexten
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Du är expert på att skriva tydliga, snygga titlar till jobbannonser"},
-                {"role": "user", "content": row['Beskrivning']},  # Använd beskrivningstexten som input
-            ]
-        )
-        # Extrahera den genererade rubriken från AI-modellen
-        simplified_headline = response.choices[0].message.content
-        
-        # Uppdatera den aktuella raden i den filtrerade tabellen med den genererade rubriken
-        filtered_subset.at[index, 'Rubrik'] = simplified_headline
+
+
+# Lista för att lagra de genererade rubrikerna
+generated_headlines = []
+
+# Kontroll om den filtrerade tabellen är tom
+if not filtered_subset.empty:
+    # Loopa igenom varje rad i den filtrerade tabellen
+    for index, row in filtered_subset.iterrows():
+        # Om det inte finns någon rubrik, använd beskrivningen för att generera en
+        if pd.isnull(row['Rubrik']):
+            # Generera en förenklad rubrik med AI-modellen baserat på beskrivningstexten
+            response = openai.Completion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "Du är expert på att skriva rubriker till jobbannonser baserat på jobbeskrivningen"},
+                    {"role": "user", "content": row['Beskrivning']},  # Använd beskrivningstexten som input
+                ]
+            )
+            # Extrahera den genererade rubriken från AI-modellen
+            simplified_headline = response.choices[0].message.content
+            
+            # Lägg till den genererade rubriken i listan
+            generated_headlines.append(simplified_headline)
+
+            # Utskrift för att kontrollera den genererade rubriken
+            print("Rad", index, "Genererad rubrik:", simplified_headline)
+        else:
+            # Om rubriken redan finns, lägg till den i listan
+            generated_headlines.append(row['Rubrik'])
+
+    # Uppdatera den filtrerade tabellen med de genererade rubrikerna
+    filtered_subset['Rubrik'] = generated_headlines
 
 # Visa den uppdaterade tabellen med de förbättrade rubrikerna
 st.write(filtered_subset)
+
+
+       
+
+
+#Du är expert på att skriva rubriker till jobbannonser baserat på jobbeskrivningen
