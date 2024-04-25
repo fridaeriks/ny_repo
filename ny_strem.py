@@ -85,9 +85,10 @@ st.write('')
 
 
 
-
-
+#
+#
 #Tabell där man kan filtrera med båda rullistorna
+
 column_aliases = {
     'headline': 'Rubrik',
     'number_of_vacancies': 'Antal Lediga Platser',
@@ -98,28 +99,19 @@ column_aliases = {
 
 
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
-places_list.insert(0, 'Visa alla')
+if 'None' in places_list:
+    places_list.remove('None')
 
 
 time_of_work = subset['working_hours_type.label'].dropna().unique().tolist()
-time_of_work.insert(0, 'Visa alla')
+if 'None' in time_of_work:
+    time_of_work.remove('None')
 
 selected_place = st.selectbox("Select Region:", places_list)
 selected_time_of_work = st.selectbox("Select Time of Work:", time_of_work)
 
-
-if selected_place == 'Visa alla':
-    region_condition = subset['workplace_address.region'].notna()
-else:
-    region_condition = subset['workplace_address.region'] == selected_place
-
-if selected_time_of_work == 'Visa alla':
-    time_of_work_condition = subset['working_hours_type.label'].notna()
-else:
-    time_of_work_condition = subset['working_hours_type.label'] == selected_time_of_work
-
-
-filtered_subset = subset[(region_condition) & (time_of_work_condition)]
+filtered_subset = subset[(subset['workplace_address.region'] == selected_place) & 
+                         (subset['working_hours_type.label'] == selected_time_of_work)]
 
 filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'description.text', 
                                    'working_hours_type.label', 'workplace_address.region', 
@@ -128,10 +120,32 @@ filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'descripti
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 
 
+#TEST MED LISTAN SOM GÅR ATT KLICKA NER
+data = [json.loads(line) for line in lines]
 
-#TEST
+# If the JSON file has nested structures, pandas will automatically flatten them
+jobtech_dataset = pd.json_normalize(data)
+
+# Select only these columns
+subset = jobtech_dataset[[
+    'headline',
+    'employer.workplace',
+    'description.text'
+]]
+
+# Title and text at the top
+st.title('Lediga jobb')
+
+# Display the first 20 job listings
+for i in range(min(len(subset), 20)):
+    with st.expander(f"{subset['headline'][i]}"):
+        st.write(f"Arbetsgivare: {subset['employer.workplace'][i]}")
+        st.write(f"Arbetsbeskrivning: {subset['description.text'][i]}")
 
 
-#TEST
+#TEST SLUTAR HÄR
+#
+#
+
 
 st.write(filtered_subset)
