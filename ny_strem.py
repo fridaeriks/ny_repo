@@ -146,7 +146,7 @@ else:
 
 filtered_subset = subset[(region_condition) & (time_of_work_condition)]
 
-filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'description.text', 
+filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_vacancies', 'description.text', 
                                    'working_hours_type.label', 'workplace_address.region', 
                                    'workplace_address.municipality']]
 
@@ -157,7 +157,7 @@ st.write(filtered_subset)
 # Select only these columns
 ny_subset = filtered_subset[[
     'Rubrik',
-    'Arbetsgivare',
+    'Arbetsgivare',  
     'Beskrivning'
 ]]
 
@@ -169,16 +169,12 @@ st.subheader('Lediga jobb')
 # Display the first 20 job listings
 for i in range(min(len(ny_subset), 10)):
     with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
-        st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'][i]}")
+        st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
         st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
 
 
 selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
 
-if len(selected_ads) < len(ny_subset):
-    remaining_ads = [ad for ad in ny_subset['Rubrik'] if ad not in selected_ads]
-    st.subheader('Övriga annonser:')
-    st.write(remaining_ads)
 
 
 #TEST SLUTAR HÄR
