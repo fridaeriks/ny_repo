@@ -46,7 +46,27 @@ st.write(subset)
 
 
 #Den gråa sidopanelen
-left_column = st.sidebar.empty()
+vidare_lasning = """Text om vi vill ha...
+
+[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om ...
+
+[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) handlar om..."""
+
+kontakt_uppgifter = """
+Head of Python Vera Hertzman
+Vera@devil.com
++46 0000000
+
+Head of AI Thea Håkansson
+Thea@apa.se
++46 00000000
+
+Head of Streamlit Frida Eriksson
+Royal@yahoo.com
++46 0000000"""
+
+
+left_column = st.sidebar
 
 left_column.markdown("""
 <style>
@@ -59,18 +79,19 @@ left_column.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-left_column.markdown("""
-<div class="left-column" style="padding: 20px;">
-<h3>Filter</h3>
-<p>Här kan man lägga till text om man vill.</p>
-<hr>
-<p style="font-size: 18px;">Våra kontaktuppgifter:</p> 
-<p style="font-size: 12px;">Vera@devil.com</p> 
-                     
-</div>
-""", unsafe_allow_html=True)
+#Texten i sidopanelen: annan text som vi kan lägga till
+left_column.markdown("### Fri text")
+left_column.markdown("Text...")
 
 
+#Vidare läsning i sidopanelen
+with left_column.expander("Vidare läsning"):
+    st.write(vidare_lasning)
+
+###
+
+with left_column.expander("Kontaktuppgifter"):
+    st.write(kontakt_uppgifter)
 
 
 # Display description of a specific row
@@ -93,6 +114,7 @@ st.write('')
 
 column_aliases = {
     'headline': 'Rubrik',
+    'employer.workplace': 'Arbetsgivare',
     'number_of_vacancies': 'Antal Lediga Platser',
     'description.text': 'Beskrivning',
     'working_hours_type.label': 'Tidsomfattning',
@@ -130,36 +152,41 @@ filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'descripti
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 
-
+st.write(filtered_subset) 
 
 # Select only these columns
-ny_subset = jobtech_dataset[[
-    'headline',
-    'employer.workplace',
-    'description.text'
+ny_subset = filtered_subset[[
+    'Rubrik',
+    'Arbetsgivare',
+    'Beskrivning'
 ]]
+
+ny_subset = ny_subset[(region_condition) & (time_of_work_condition)]
 
 # Title and text at the top
 st.subheader('Lediga jobb')
 
 # Display the first 20 job listings
 for i in range(min(len(ny_subset), 10)):
-   # if ny_subset['headline'][i] in selected_ads:
-    with st.expander(f"{subset['headline'][i]}"):
-        st.write(f"Arbetsgivare: {ny_subset['employer.workplace'][i]}")
-        st.write(f"Arbetsbeskrivning: {ny_subset['description.text'][i]}")
+    with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
+        st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'][i]}")
+        st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
 
-selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['headline'])
 
-#if len(selected_ads) < len(ny_subset):
-    #remaining_ads = [ad for ad in ny_subset['headline'] if ad not in selected_ads]
-    #st.subheader('Övriga annonser:')
-    #st.write(remaining_ads)
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
+
+if len(selected_ads) < len(ny_subset):
+    remaining_ads = [ad for ad in ny_subset['Rubrik'] if ad not in selected_ads]
+    st.subheader('Övriga annonser:')
+    st.write(remaining_ads)
 
 
 #TEST SLUTAR HÄR
 #
 #
+
+
+
 
 
 st.write(filtered_subset)
