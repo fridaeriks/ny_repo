@@ -38,6 +38,7 @@ def generate_industry(headline):
                 {"role": "user", "content": f"Kan du hitta vilka branscher jobbannonsen \"{headline}\" tillhör?"}
             ]
         )
+        st.write(response)
         return response.choices[0].message['content']
     except Exception as e:
         print(f"Error occurred: {e}")
