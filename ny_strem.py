@@ -38,7 +38,8 @@ subset = jobtech_dataset[[
 ]]
 
 #Titel och text högst upp
-st.title('JIMLIN')
+st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
+
 st.markdown("Info om vårt projekt")
 st.markdown("---")
 st.write(subset)
@@ -53,18 +54,25 @@ vidare_lasning = """Text om vi vill ha...
 [How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) handlar om..."""
 
 kontakt_uppgifter = """
-Head of Python Vera Hertzman
-Vera@devil.com
+Python Consulant Vera Hertzman
+Vera@outlook.com
 +46 0000000
 
 Head of AI Thea Håkansson
-Thea@apa.se
+Thea@gmail.se
 +46 00000000
 
 Head of Streamlit Frida Eriksson
 Royal@yahoo.com
-+46 0000000"""
++46 0000000
 
+Project Coordinator Miranda Tham
+Miranda@hotmail.com
++46 0000000
+
+Agenda and Report Administrator Tove Lennertsson
+Tove@gmail.com
++46 0000000"""
 
 left_column = st.sidebar
 
@@ -83,12 +91,9 @@ left_column.markdown("""
 left_column.markdown("### Fri text")
 left_column.markdown("Text...")
 
-
 #Vidare läsning i sidopanelen
 with left_column.expander("Vidare läsning"):
     st.write(vidare_lasning)
-
-###
 
 with left_column.expander("Kontaktuppgifter"):
     st.write(kontakt_uppgifter)
@@ -105,16 +110,10 @@ st.write(subset.columns)
 st.write('')
 
 
-
-
-
-#
-#
 #Tabell där man kan filtrera med båda rullistorna
 
 column_aliases = {
     'headline': 'Rubrik',
-    'employer.workplace': 'Arbetsgivare',
     'number_of_vacancies': 'Antal Lediga Platser',
     'description.text': 'Beskrivning',
     'working_hours_type.label': 'Tidsomfattning',
@@ -129,8 +128,8 @@ places_list.insert(0, 'Visa alla')
 time_of_work = subset['working_hours_type.label'].dropna().unique().tolist()
 time_of_work.insert(0, 'Visa alla')
 
-selected_place = st.selectbox("Select Region:", places_list)
-selected_time_of_work = st.selectbox("Select Time of Work:", time_of_work)
+selected_place = st.selectbox("Välj region:", places_list)
+selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
 
 
 if selected_place == 'Visa alla':
@@ -152,7 +151,7 @@ filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 
-st.write(filtered_subset) 
+
 
 # Select only these columns
 ny_subset = filtered_subset[[
@@ -160,8 +159,6 @@ ny_subset = filtered_subset[[
     'Arbetsgivare',  
     'Beskrivning'
 ]]
-
-ny_subset = ny_subset[(region_condition) & (time_of_work_condition)]
 
 # Title and text at the top
 st.subheader('Lediga jobb')
@@ -173,7 +170,7 @@ for i in range(min(len(ny_subset), 10)):
         st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
 
 
-selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['headline'])
 
 
 
