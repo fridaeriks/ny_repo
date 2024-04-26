@@ -49,9 +49,14 @@ st.write(subset)
 #Den gråa sidopanelen
 vidare_lasning = """Text om vi vill ha...
 
-[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om ...
+[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om de 
+ekonomiska utmaningarna för svenska idrottare med Norge och Danmark, 
+pekar på bristande stöd under utvecklingsfasen och den resulterande ekonomiska osäkerheten.
 
-[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) handlar om..."""
+[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) 
+handlar om hur idrottare, särskilt kvinnor och de i mindre populära idrottsgrenar, 
+kämpar med ekonomisk osäkerhet och måste kombinera sin idrottskarriär med andra jobb 
+för att klara ekonomin."""
 
 kontakt_uppgifter = """
 Python Consulant Vera Hertzman
