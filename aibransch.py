@@ -20,9 +20,8 @@ jobtech_dataset = pd.json_normalize(data)
 
 # Select only relevant columns and make a copy to avoid SettingWithCopyWarning
 subset = jobtech_dataset[[
-    'id',
     'headline',
-    'keywords.extracted.occupation'
+    'description.text'
 ]].copy()
 
 # Define a function to preprocess text
@@ -35,10 +34,10 @@ def preprocess_text(text):
 
 # Apply text preprocessing
 subset['headline'] = subset['headline'].apply(preprocess_text)
-subset['keywords.extracted.occupation'] = subset['keywords.extracted.occupation'].apply(preprocess_text)
+subset['description.text'] = subset['description.text'].apply(preprocess_text)
 
 # Combine headline and keywords into a single text for each job ad
-subset['combined_text'] = subset['headline'] + ' ' + subset['keywords.extracted.occupation']
+subset['combined_text'] = subset['headline'] + ' ' + subset['description.text']
 
 # Justera vektoriseringen för att använda olika parametrar
 vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
