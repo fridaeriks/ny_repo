@@ -38,7 +38,7 @@ subset = jobtech_dataset[[
 ]]
 
 #Titel och text högst upp
-st.title('Vårt namn')
+st.title('JIMLIN')
 st.markdown("Info om vårt projekt")
 st.markdown("---")
 st.write(subset)
