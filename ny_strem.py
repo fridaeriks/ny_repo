@@ -46,7 +46,27 @@ st.write(subset)
 
 
 #Den gråa sidopanelen
-left_column = st.sidebar.empty()
+vidare_lasning = """Text om vi vill ha...
+
+[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om ...
+
+[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) handlar om..."""
+
+kontakt_uppgifter = """
+Head of Python Vera Hertzman
+Vera@devil.com
++46 0000000
+
+Head of AI Thea Håkansson
+Thea@apa.se
++46 00000000
+
+Head of Streamlit Frida Eriksson
+Royal@yahoo.com
++46 0000000"""
+
+
+left_column = st.sidebar
 
 left_column.markdown("""
 <style>
@@ -59,18 +79,19 @@ left_column.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-left_column.markdown("""
-<div class="left-column" style="padding: 20px;">
-<h3>Filter</h3>
-<p>Här kan man lägga till text om man vill.</p>
-<hr>
-<p style="font-size: 18px;">Våra kontaktuppgifter:</p> 
-<p style="font-size: 12px;">Vera@devil.com</p> 
-                     
-</div>
-""", unsafe_allow_html=True)
+#Texten i sidopanelen: annan text som vi kan lägga till
+left_column.markdown("### Fri text")
+left_column.markdown("Text...")
 
 
+#Vidare läsning i sidopanelen
+with left_column.expander("Vidare läsning"):
+    st.write(vidare_lasning)
+
+###
+
+with left_column.expander("Kontaktuppgifter"):
+    st.write(kontakt_uppgifter)
 
 
 # Display description of a specific row
@@ -160,6 +181,9 @@ selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subse
 #TEST SLUTAR HÄR
 #
 #
+
+
+
 
 
 st.write(filtered_subset)
