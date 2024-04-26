@@ -93,6 +93,7 @@ st.write('')
 
 column_aliases = {
     'headline': 'Rubrik',
+    'employer.workplace': 'Arbetsgivare',
     'number_of_vacancies': 'Antal Lediga Platser',
     'description.text': 'Beskrivning',
     'working_hours_type.label': 'Tidsomfattning',
@@ -130,31 +131,33 @@ filtered_subset = filtered_subset[['headline', 'number_of_vacancies', 'descripti
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 
-
+st.write(filtered_subset) 
 
 # Select only these columns
-ny_subset = jobtech_dataset[[
-    'headline',
-    'employer.workplace',
-    'description.text'
+ny_subset = filtered_subset[[
+    'Rubrik',
+    'Arbetsgivare',
+    'Beskrivning'
 ]]
+
+ny_subset = ny_subset[(region_condition) & (time_of_work_condition)]
 
 # Title and text at the top
 st.subheader('Lediga jobb')
 
 # Display the first 20 job listings
 for i in range(min(len(ny_subset), 10)):
-   # if ny_subset['headline'][i] in selected_ads:
-    with st.expander(f"{subset['headline'][i]}"):
-        st.write(f"Arbetsgivare: {ny_subset['employer.workplace'][i]}")
-        st.write(f"Arbetsbeskrivning: {ny_subset['description.text'][i]}")
+    with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
+        st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'][i]}")
+        st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
 
-selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['headline'])
 
-#if len(selected_ads) < len(ny_subset):
-    #remaining_ads = [ad for ad in ny_subset['headline'] if ad not in selected_ads]
-    #st.subheader('Övriga annonser:')
-    #st.write(remaining_ads)
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
+
+if len(selected_ads) < len(ny_subset):
+    remaining_ads = [ad for ad in ny_subset['Rubrik'] if ad not in selected_ads]
+    st.subheader('Övriga annonser:')
+    st.write(remaining_ads)
 
 
 #TEST SLUTAR HÄR
