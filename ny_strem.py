@@ -18,6 +18,8 @@ with open("Open_AI_key", "r") as file:
 # Ange din API-nyckel
 openai.api_key = api_key
 
+
+
 # Load the JSON file into a DataFrame 
 lines = []
 with open('dataset.jsonl', 'rb') as file: 
@@ -114,29 +116,20 @@ with left_column.expander("Kontaktuppgifter"):
     st.write(kontakt_uppgifter)
 
 
-# Display description of a specific row
-row_index = st.slider("Select Row Index", 0, len(subset)-1, 25)
-st.subheader("Description for Selected Row:")
-st.write(subset['description.text'].iloc[row_index])
-
-
-
-# Show the variables in the dataset (equivalent to column names)
-st.write("Columns in the dataset:")
-st.write(subset.columns)
-st.write('')
 
 
 #Tabell där man kan filtrera med båda rullistorna
 
 column_aliases = {
-    'headline': 'Rubrik',
-    'employer.workplace': 'Arbetsgivare',
-    'number_of_vacancies': 'Antal Lediga Platser',
-    'description.text': 'Beskrivning',
-    'working_hours_type.label': 'Tidsomfattning',
-    'workplace_address.region': 'Region',
-    'workplace_address.municipality': 'Kommun'}
+    'headline': 'headline',
+    'employer.workplace': 'employer.workplace',
+    'number_of_vacancies': 'number_of_vacancies',
+    'description.text': 'description.text',
+    'working_hours_type.label': 'working_hours_type.label',
+    'workplace_address.region': 'workplace_address.region',
+    'workplace_address.municipality': 'workplace_address.municipality'
+}
+
 
 
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
@@ -185,6 +178,12 @@ ny_subset = filtered_subset[[
 st.subheader('Lediga jobb')
 
 
+
+
+number = 10
+ 
+
+
 for i in range(min(len(filtered_subset), 10)):
     with st.expander(f"Jobbannons {i+1} - {filtered_subset['headline'].iloc[i]}"):
         st.write("-------------------------------------------------")
@@ -204,14 +203,18 @@ for i in range(min(len(filtered_subset), 10)):
 
 
 
+
 #Show more options
 if len(ny_subset) > number:
     if st.button('Visa fler'):
+        st.empty()
         number += 10
         for i in range(number - 10, min(len(ny_subset), number)):
-            with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
-                st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
-                st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
+            with st.expander(f"{ny_subset['headline'].iloc[i]}"):
+                st.write(f"Arbetsgivare: {ny_subset['employer.workplace'].iloc[i]}")
+                st.write(f"Arbetsbeskrivning: {ny_subset['description.text'].iloc[i]}")
+
+
 
                 
 
