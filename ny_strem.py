@@ -118,7 +118,6 @@ with left_column.expander("Kontaktuppgifter"):
 
 
 
-
 #Tabell där man kan filtrera med båda rullistorna
 
 column_aliases = {
@@ -177,6 +176,12 @@ ny_subset = filtered_subset[[
 
 # Title and text at the top
 st.subheader('Lediga jobb')
+
+
+
+
+number = 10
+ 
 
 
 for i in range(min(len(filtered_subset), 10)):
