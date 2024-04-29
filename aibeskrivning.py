@@ -56,62 +56,22 @@ st.title('Jobtech Dataset')
 # Display the DataFrame
 st.write(subset)
 
-# Display description of a specific row
-row_index = st.slider("Välj radindex", 0, len(subset)-1, 25)
-st.subheader("Beskrivning för vald rad:")
-description_text = subset['description.text'].iloc[row_index]
+# Loop through the first 10 rows and display description text
+st.subheader("Beskrivning för de första 10 annonserna (omformulerade av OpenAI):")
+for i in range(10):
+    st.write(f"Beskrivning för annons {i+1}:")
+    
+    # Anropa OpenAI för att omformulera beskrivningstexten
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
+            {"role": "user", "content": subset['description.text'].iloc[i]},
+        ]
+    )
 
+    # Hämta och skriv ut den genererade omformulerade beskrivningen
+    for choice in response.choices:
+        simplified_description = choice.message.content
+        st.write(simplified_description)
 
-response = client.chat.completions.create(
-  model="gpt-3.5-turbo",
-  messages=[
-    {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
-    {"role": "user", "content": "Kan du skriva om jobbannonsen på ett mer flytande och enkelt sätt i en sammanhängande text? Svara endast med den uppdaterade texten"},
-  ]
-)
-
-# Hämta och skriv ut den genererade beskrivningen
-simplified_description = response.choices[0]
-
-# Extrahera beskrivningen från Choice-objektet
-description_content = simplified_description.message.content
-
-# Skriv ut den rensade beskrivningen
-st.write(description_content)
-
-
-# Show the variables in the dataset (equivalent to column names)
-st.write("Columns in the dataset:")
-st.write(subset.columns)
-st.write('')
-
-# Extract unique values from the column "employer.workplace"
-places_list = subset['workplace_address.region'].unique().tolist()
-
-# Display the list of different places jobs are located
-st.write("List of Different Places Jobs are Located:")
-st.write(places_list)
-
-# Extract unique values from the column "working_hours_type.label"
-time_of_work = subset['working_hours_type.label'].unique().tolist()
-st.write("List of working hours type:")
-st.write(time_of_work)
-
-subset = subset.dropna(subset=['working_hours_type.label'])
-subset['working_hours_type.label'] = subset['working_hours_type.label'].apply(lambda text: text.strip())
-
-word_to_count = "deltid" 
-try:
-    subset['word_count'] = subset['working_hours_type.label'].apply(lambda text: text.lower().count(word_to_count.lower()))
-    total_word_count = subset['word_count'].sum()
-    st.write("\nTotal occurrences of '{}': {}".format(word_to_count, total_word_count))
-    st.write(' ')
-except Exception as e:
-    st.write("An error occurred:", e)
-
-# Först se till att alla rader som har NaN-värden i kolumnen 'working_hours_type.label' tas bort
-subset = subset.dropna(subset=['working_hours_type.label'])
-# Filtrera rader där kolumnen 'working_hours_type.label' innehåller ordet 'deltid'
-deltid_rows = subset[subset['working_hours_type.label'].str.contains('deltid', na=False, case=False)]
-# Skriv ut de filtrerade raderna
-st.write(deltid_rows)
