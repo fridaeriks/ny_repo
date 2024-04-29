@@ -2,6 +2,36 @@
 import pandas as pd
 import json
 import streamlit as st
+import openai
+from openai import OpenAI
+
+
+#AI KOD
+API_KEY = open('Open_AI_key', 'r').read()
+
+client = OpenAI(
+    api_key=API_KEY
+) 
+
+# Läs in API-nyckeln från filen
+with open("Open_AI_key", "r") as file:
+    api_key = file.read().strip()
+
+# Ange din API-nyckel
+openai.api_key = api_key
+
+response = client.chat.completions.create(
+  model="gpt-3.5-turbo",
+  messages=[
+    {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
+    {"role": "user", "content": "Kan du skriva om jobbannonsen på ett mer flytande och enkelt sätt i en sammanhängande text? Svara endast med den uppdaterade texten"},
+  ]
+)
+
+
+
+
+
 
 # Load the JSON file into a DataFrame 
 lines = []
@@ -104,6 +134,8 @@ row_index = st.slider("Select Row Index", 0, len(subset)-1, 25)
 st.subheader("Description for Selected Row:")
 st.write(subset['description.text'].iloc[row_index])
 
+
+
 # Show the variables in the dataset (equivalent to column names)
 st.write("Columns in the dataset:")
 st.write(subset.columns)
@@ -170,6 +202,11 @@ for i in range(min(len(ny_subset), number)):
     with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
         st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
         st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
+        
+        if i < len(response.choices):
+            simplified_description = response.choices[0]
+            description_content = simplified_description.message.content
+            st.write(description_content)
 
 #Show more options
 if len(ny_subset) > number:
@@ -180,8 +217,10 @@ if len(ny_subset) > number:
                 st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
                 st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
 
+                
 
-#selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
+
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
 
 
 
