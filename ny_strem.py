@@ -29,10 +29,6 @@ response = client.chat.completions.create(
 )
 
 
-
-
-
-
 # Load the JSON file into a DataFrame 
 lines = []
 with open('dataset.jsonl', 'rb') as file: 
@@ -208,14 +204,32 @@ for i in range(min(len(ny_subset), number)):
             description_content = simplified_description.message.content
             st.write(description_content)
 
-#Show more options
-if len(ny_subset) > number:
-    if st.button('Visa fler'):
-        number += 10
-        for i in range(number - 10, min(len(ny_subset), number)):
-            with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
-                st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
-                st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
+
+
+def main():
+    number = 10
+    # Koden för att skapa expanderarna
+    if len(ny_subset) > number:
+        if st.button('Visa fler'):
+            number += 10
+            # Skapa en tom plats för expanderarna
+            expander_placeholder = st.empty()
+            # Skapa de nya expanderarna
+            for i in range(number - 10, min(len(ny_subset), number)):
+                with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
+                    st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
+                    st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
+                    # Lägg till kod för att visa relevant information från response
+                    if i < len(response.choices):
+                        simplified_description = response.choices[i]  # använda i istället för 0
+                        description_content = simplified_description.message.content
+                        st.write(description_content)
+            # Rensa utrymmet genom att ersätta det med de nya expanderarna
+            expander_placeholder.empty()
+
+if __name__ == "__main__":
+    main()
+
 
                 
 
