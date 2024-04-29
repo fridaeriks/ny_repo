@@ -56,28 +56,22 @@ st.title('Jobtech Dataset')
 # Display the DataFrame
 st.write(subset)
 
-# Display description of a specific row
-row_index = st.slider("Välj radindex", 0, len(subset)-1, 25)
-st.subheader("Beskrivning för vald rad:")
-description_text = subset['description.text'].iloc[row_index]
+# Loop through the first 10 rows and display description text
+st.subheader("Beskrivning för de första 10 annonserna (omformulerade av OpenAI):")
+for i in range(10):
+    st.write(f"Beskrivning för annons {i+1}:")
+    
+    # Anropa OpenAI för att omformulera beskrivningstexten
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
+            {"role": "user", "content": subset['description.text'].iloc[i]},
+        ]
+    )
 
-
-response = client.chat.completions.create(
-  model="gpt-3.5-turbo",
-  messages=[
-    {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
-    {"role": "user", "content": "Kan du skriva om jobbannonsen på ett mer flytande och enkelt sätt i en sammanhängande text? Svara endast med den uppdaterade texten"},
-  ]
-)
-
-# Hämta och skriv ut den genererade beskrivningen
-simplified_description = response.choices[0]
-
-# Extrahera beskrivningen från Choice-objektet
-description_content = simplified_description.message.content
-
-# Skriv ut den rensade beskrivningen
-st.write(description_content)
-
-
+    # Hämta och skriv ut den genererade omformulerade beskrivningen
+    for choice in response.choices:
+        simplified_description = choice.message.content
+        st.write(simplified_description)
 
