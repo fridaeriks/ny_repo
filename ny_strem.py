@@ -119,6 +119,8 @@ row_index = st.slider("Select Row Index", 0, len(subset)-1, 25)
 st.subheader("Description for Selected Row:")
 st.write(subset['description.text'].iloc[row_index])
 
+
+
 # Show the variables in the dataset (equivalent to column names)
 st.write("Columns in the dataset:")
 st.write(subset.columns)
@@ -129,6 +131,7 @@ st.write('')
 
 column_aliases = {
     'headline': 'Rubrik',
+    'employer.workplace': 'Arbetsgivare',
     'number_of_vacancies': 'Antal Lediga Platser',
     'description.text': 'Beskrivning',
     'working_hours_type.label': 'Tidsomfattning',
@@ -164,6 +167,7 @@ else:
 
 filtered_subset = subset[(region_condition) & (time_of_work_condition)]
 
+
 for i in range(min(len(filtered_subset), 10)):
     with st.expander(f"Jobbannons {i+1} - {filtered_subset['headline'].iloc[i]}"):
         st.write("-------------------------------------------------")
@@ -181,7 +185,40 @@ for i in range(min(len(filtered_subset), 10)):
             simplified_description = choice.message.content
             st.write(f"{simplified_description}")
 
-selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['headline'])
+filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_vacancies', 'description.text', 
+                                   'working_hours_type.label', 'workplace_address.region', 
+                                   'workplace_address.municipality']]
+
+filtered_subset = filtered_subset.rename(columns=column_aliases) 
+
+
+
+# Select only these columns
+ny_subset = filtered_subset[[
+    'headline',
+    'employer.workplace',  
+    'description.text'
+]]
+
+# Title and text at the top
+st.subheader('Lediga jobb')
+
+
+
+#Show more options
+if len(ny_subset) > number:
+    if st.button('Visa fler'):
+        number += 10
+        for i in range(number - 10, min(len(ny_subset), number)):
+            with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
+                st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
+                st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
+
+                
+
+
+
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
 
 #TEST SLUTAR HÄR
 #
