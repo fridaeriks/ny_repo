@@ -31,7 +31,7 @@ subset = jobtech_dataset[[
 # Define function to generate industry using OpenAI API
 def generate_industry(headline):
     try:
-        response = client.chat.completions.create(
+        response = client.chat_completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Du är expert identifiera vilken bransch olika jobb tillhör"},
