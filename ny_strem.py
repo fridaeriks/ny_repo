@@ -2,6 +2,7 @@
 import pandas as pd
 import json
 import streamlit as st
+import folium
 
 # Load the JSON file into a DataFrame 
 lines = []
@@ -50,8 +51,8 @@ st.write(subset)
 vidare_lasning = """Text om vi vill ha...
 
 [Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om de 
-ekonomiska utmaningarna för svenska idrottare med Norge och Danmark, 
-pekar på bristande stöd under utvecklingsfasen och den resulterande ekonomiska osäkerheten.
+ekonomiska utmaningarna för svenska idrottare i jämförelse med Norge och Danmark, 
+där texten ppekar på bristande stöd under utvecklingsfasen och den resulterande ekonomiska osäkerheten.
 
 [How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) 
 handlar om hur idrottare, särskilt kvinnor och de i mindre populära idrottsgrenar, 
@@ -138,6 +139,25 @@ selected_place = st.selectbox("Välj region:", places_list)
 selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
 
 
+
+
+#KOD SOM TESTAR ATT MAN KAN VÄLJA FLER ÄN EN REGION - START
+selected_regions = st.multiselect("Välj regioner:", places_list, default=places_list)
+
+
+# Filtervillkor för regioner
+if not selected_regions:  # Om inga regioner väljs, visa alla
+    region_condition = subset['workplace_address.region'].notna()
+else:
+    region_condition = subset['workplace_address.region'].isin(selected_regions)
+
+# Apply the region filter
+filtered_subset = subset[region_condition]
+
+#KOD SOM TESTAR ATT MAN KAN VÄLJA FLER ÄN EN REGION - STOPP
+
+
+
 if selected_place == 'Visa alla':
     region_condition = subset['workplace_address.region'].notna()
 else:
@@ -156,6 +176,19 @@ filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_
                                    'workplace_address.municipality']]
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
+
+#HÄR HAR JAG ÄNDRAT
+
+job_count = filtered_subset.shape[0]
+
+st.markdown(f"<h1 style='font-weight: bold; color: green;'>{job_count} st </h1>", unsafe_allow_html=True)
+st.markdown("jobb matchar din sökning")
+
+
+
+
+###
+
 
 
 
@@ -189,10 +222,6 @@ if len(ny_subset) > number:
 #selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
 
 
-
-#TEST SLUTAR HÄR
-#
-#
 
 
 
