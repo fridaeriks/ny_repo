@@ -2,7 +2,23 @@
 import pandas as pd
 import json
 import streamlit as st
-import folium
+
+import openai
+from openai import OpenAI
+
+API_KEY = open('Open_AI_key', 'r').read()
+
+client = OpenAI(
+    api_key=API_KEY
+) 
+
+# Läs in API-nyckeln från filen
+with open("Open_AI_key", "r") as file:
+    api_key = file.read().strip()
+
+# Ange din API-nyckel
+openai.api_key = api_key
+
 
 # Load the JSON file into a DataFrame 
 lines = []
@@ -105,27 +121,20 @@ with left_column.expander("Kontaktuppgifter"):
     st.write(kontakt_uppgifter)
 
 
-# Display description of a specific row
-row_index = st.slider("Select Row Index", 0, len(subset)-1, 25)
-st.subheader("Description for Selected Row:")
-st.write(subset['description.text'].iloc[row_index])
-
-# Show the variables in the dataset (equivalent to column names)
-st.write("Columns in the dataset:")
-st.write(subset.columns)
-st.write('')
 
 
 #Tabell där man kan filtrera med båda rullistorna
 
 column_aliases = {
-    'headline': 'Rubrik',
-    'employer.workplace': 'Arbetsgivare',
-    'number_of_vacancies': 'Antal Lediga Platser',
-    'description.text': 'Beskrivning',
-    'working_hours_type.label': 'Tidsomfattning',
-    'workplace_address.region': 'Region',
-    'workplace_address.municipality': 'Kommun'}
+    'headline': 'headline',
+    'employer.workplace': 'employer.workplace',
+    'number_of_vacancies': 'number_of_vacancies',
+    'description.text': 'description.text',
+    'working_hours_type.label': 'working_hours_type.label',
+    'workplace_address.region': 'workplace_address.region',
+    'workplace_address.municipality': 'workplace_address.municipality'
+}
+
 
 
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
@@ -135,27 +144,14 @@ places_list.insert(0, 'Visa alla')
 time_of_work = subset['working_hours_type.label'].dropna().unique().tolist()
 time_of_work.insert(0, 'Visa alla')
 
+# Select only these columns for initial display
+ny_subset = subset[['headline', 'employer.workplace', 'description.text']]
+
+# Display the DataFrame
+st.subheader('Lediga jobb')
+
 selected_place = st.selectbox("Välj region:", places_list)
 selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
-
-
-
-
-#KOD SOM TESTAR ATT MAN KAN VÄLJA FLER ÄN EN REGION - START
-selected_regions = st.multiselect("Välj regioner:", places_list, default=places_list)
-
-
-# Filtervillkor för regioner
-if not selected_regions:  # Om inga regioner väljs, visa alla
-    region_condition = subset['workplace_address.region'].notna()
-else:
-    region_condition = subset['workplace_address.region'].isin(selected_regions)
-
-# Apply the region filter
-filtered_subset = subset[region_condition]
-
-#KOD SOM TESTAR ATT MAN KAN VÄLJA FLER ÄN EN REGION - STOPP
-
 
 
 if selected_place == 'Visa alla':
@@ -167,7 +163,6 @@ if selected_time_of_work == 'Visa alla':
     time_of_work_condition = subset['working_hours_type.label'].notna()
 else:
     time_of_work_condition = subset['working_hours_type.label'] == selected_time_of_work
-
 
 filtered_subset = subset[(region_condition) & (time_of_work_condition)]
 
@@ -191,37 +186,61 @@ st.markdown("jobb matchar din sökning")
 
 
 
-
 # Select only these columns
 ny_subset = filtered_subset[[
-    'Rubrik',
-    'Arbetsgivare',  
-    'Beskrivning'
+    'headline',
+    'employer.workplace',  
+    'description.text'
 ]]
 
 # Title and text at the top
 st.subheader('Lediga jobb')
 
-# Display the first 10 job listings
+
+
+
 number = 10
-for i in range(min(len(ny_subset), number)):
-    with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
-        st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
-        st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
+ 
+
+
+for i in range(min(len(filtered_subset), 10)):
+    with st.expander(f"Jobbannons {i+1} - {filtered_subset['headline'].iloc[i]}"):
+        st.write("-------------------------------------------------")
+        # Anropa OpenAI för att omformulera beskrivningstexten
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
+                {"role": "user", "content": filtered_subset['description.text'].iloc[i]},
+            ]
+        )
+
+        # Hämta och skriv ut den genererade omformulerade beskrivningen
+        for choice in response.choices:
+            simplified_description = choice.message.content
+            st.write(f"{simplified_description}")
+
+
+
 
 #Show more options
 if len(ny_subset) > number:
     if st.button('Visa fler'):
+        st.empty()
         number += 10
         for i in range(number - 10, min(len(ny_subset), number)):
-            with st.expander(f"{ny_subset['Rubrik'].iloc[i]}"):
-                st.write(f"Arbetsgivare: {ny_subset['Arbetsgivare'].iloc[i]}")
-                st.write(f"Arbetsbeskrivning: {ny_subset['Beskrivning'].iloc[i]}")
+            with st.expander(f"{ny_subset['headline'].iloc[i]}"):
+                st.write(f"Arbetsgivare: {ny_subset['employer.workplace'].iloc[i]}")
+                st.write(f"Arbetsbeskrivning: {ny_subset['description.text'].iloc[i]}")
 
 
-#selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
+
+                
 
 
+
+
+selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
 
 
 
