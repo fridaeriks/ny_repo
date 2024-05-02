@@ -2,6 +2,7 @@
 import pandas as pd
 import json
 import streamlit as st
+
 import openai
 from openai import OpenAI
 
@@ -17,7 +18,6 @@ with open("Open_AI_key", "r") as file:
 
 # Ange din API-nyckel
 openai.api_key = api_key
-
 
 
 # Load the JSON file into a DataFrame 
@@ -66,9 +66,14 @@ st.write(subset)
 #Den gråa sidopanelen
 vidare_lasning = """Text om vi vill ha...
 
-[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om ...
+[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om de 
+ekonomiska utmaningarna för svenska idrottare i jämförelse med Norge och Danmark, 
+där texten ppekar på bristande stöd under utvecklingsfasen och den resulterande ekonomiska osäkerheten.
 
-[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) handlar om..."""
+[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) 
+handlar om hur idrottare, särskilt kvinnor och de i mindre populära idrottsgrenar, 
+kämpar med ekonomisk osäkerhet och måste kombinera sin idrottskarriär med andra jobb 
+för att klara ekonomin."""
 
 kontakt_uppgifter = """
 Python Consulant Vera Hertzman
@@ -148,6 +153,7 @@ st.subheader('Lediga jobb')
 selected_place = st.selectbox("Välj region:", places_list)
 selected_time_of_work = st.selectbox("Välj tidsomfattning:", time_of_work)
 
+
 if selected_place == 'Visa alla':
     region_condition = subset['workplace_address.region'].notna()
 else:
@@ -165,6 +171,19 @@ filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_
                                    'workplace_address.municipality']]
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
+
+#HÄR HAR JAG ÄNDRAT
+
+job_count = filtered_subset.shape[0]
+
+st.markdown(f"<h1 style='font-weight: bold; color: green;'>{job_count} st </h1>", unsafe_allow_html=True)
+st.markdown("jobb matchar din sökning")
+
+
+
+
+###
+
 
 
 # Select only these columns
@@ -214,12 +233,10 @@ if len(ny_subset) > number:
                 st.write(f"Arbetsbeskrivning: {ny_subset['description.text'].iloc[i]}")
 
 
-
                 
 
-
-
 selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
+
 
 
 
