@@ -234,11 +234,7 @@ if len(ny_subset) > number:
                 st.write(f"Arbetsbeskrivning: {ny_subset['description.text'].iloc[i]}")
 
 
-
                 
-
-
-
 
 selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
 
