@@ -11,10 +11,10 @@ import zipfile
 
 print("Running...")
 
-# Retry fetching data with a maximum of 3 attempts
+# Försök hämta data med maximalt 3 försök
 for attempt in range(3):
     try:
-        # Fetch data from URL and write to JSONL file
+        # Hämta data från URL och skriv till JSONL-fil
         if not os.path.exists("dataset.jsonl"):
             url = "https://data.jobtechdev.se/annonser/historiska/2023.jsonl.zip"
 
@@ -26,12 +26,12 @@ for attempt in range(3):
                 with zip_file.open(file_name) as jsonl_file:
                     print("File loaded successfully!")
 
-                    # Write to the JSONL file
-                    with open("dataset.jsonl", "wb") as output_file:  # Use "wb" mode to write
+                    # Skriv till JSONL-filen
+                    with open("dataset.jsonl", "wb") as output_file:  # Använd "wb"-läge för att skriva
                         for line in jsonl_file:
                             output_file.write(line)
                     print("JSONL data written successfully!")
-        break  # Exit the retry loop if data fetching is successful
+        break  #Avsluta om försöket att hämta data är framgångsrikt
     except requests.exceptions.RequestException as e:
         print("Failed to fetch data (attempt {}): {}".format(attempt + 1, e))
     except Exception as e:
@@ -50,12 +50,12 @@ with open("Open_AI_key", "r") as file:
 # Ange din API-nyckel
 openai.api_key = api_key
 
-# Check if the CSV file exists
+# Kontrollera om CSV-filen finns
 if os.path.isfile('subset.csv'):
-    # If CSV exists, read it into DataFrame
+    # Om CSV-filen finns, läs in den i DataFrame
     subset = pd.read_csv('subset.csv')
 else:
-    # Load the JSON file into a DataFrame 
+    # Ladda upp JASONL filen in i vår DataFrame
     lines = []
     try:
         url = "https://data.jobtechdev.se/annonser/historiska/2023.jsonl.zip"
@@ -67,20 +67,20 @@ else:
             with zip_file.open(file_name) as jsonl_file:
                 print("File loaded successfully!")
 
-                # Convert each line from JSON format to Python dictionary
+                # Konvertera varje rad från JSON-format till Python-dictionary
                 for i, line in enumerate(jsonl_file):
                     lines.append(line.strip())
                     if i >= 9999:
                         break
 
 
-        # Convert each line from JSON format to Python dictionary
+        # Konvertera varje rad från JSON-format till Python-dictionary
         data = [json.loads(line) for line in lines]
 
-        # If the JSON file has nested structures, pandas will automatically flatten them
+        # Om JSON-filen har nästlade strukturer, kommer pandas automatiskt att platta ut dem
         jobtech_dataset = pd.json_normalize(data)
 
-        #select only these columns
+        # De komunder som ingår i datasettet
         subset = jobtech_dataset[[
             'id',
             'original_id',
@@ -100,7 +100,7 @@ else:
             'keywords.extracted.occupation'
         ]]
 
-        # Write the subset DataFrame to CSV
+        # Gör om subdet DataFrame till CSV
         subset.to_csv('subset.csv', index=False)
 
         print("Done!")
@@ -112,7 +112,7 @@ else:
 
 print("Almost done!")
 
-#Titel och text högst upp
+# Titel och text högst upp
 st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
 
 st.markdown("Info om vårt projekt")
@@ -121,7 +121,9 @@ st.write(subset)
 
 
 
-#Den gråa sidopanelen
+# Grå sidopanel
+
+# Text som ingår i vidare läsning (sidopanel)
 vidare_lasning = """Text om vi vill ha...
 
 [Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om de 
@@ -133,6 +135,7 @@ handlar om hur idrottare, särskilt kvinnor och de i mindre populära idrottsgre
 kämpar med ekonomisk osäkerhet och måste kombinera sin idrottskarriär med andra jobb 
 för att klara ekonomin."""
 
+# Text som ingår i kontaktuppgifter (sidopanel)
 kontakt_uppgifter = """
 Python Consulant Vera Hertzman
 Vera@outlook.com
@@ -154,6 +157,9 @@ Agenda and Report Administrator Tove Lennertsson
 Tove@gmail.com
 +46 0000000"""
 
+# Text som ingår i om oss (sidopanel)
+om_oss = '...'
+
 left_column = st.sidebar
 
 left_column.markdown("""
@@ -167,22 +173,24 @@ left_column.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-#Texten i sidopanelen: annan text som vi kan lägga till
+# Texten i sidopanelen: annan text som vi kan lägga till
 left_column.markdown("### Fri text")
 left_column.markdown("Text...")
 
-#Vidare läsning i sidopanelen
+# Vidare läsning i sidopanelen
 with left_column.expander("Vidare läsning"):
     st.write(vidare_lasning)
 
+# Kontaktuppgifter i sidopanelen
 with left_column.expander("Kontaktuppgifter"):
     st.write(kontakt_uppgifter)
 
-
+# Om oss i sidopanelen
+with left_column.expander("Om oss"):
+    st.write(om_oss)
 
 
 #Tabell där man kan filtrera med båda rullistorna
-
 column_aliases = {
     'headline': 'headline',
     'employer.workplace': 'employer.workplace',
@@ -195,7 +203,6 @@ column_aliases = {
 }
 
 
-
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
 places_list.insert(0, 'Visa alla')
 
@@ -206,10 +213,10 @@ time_of_work.insert(0, 'Visa alla')
 duration_time = subset['duration.label'].dropna().unique().tolist()
 duration_time.insert(0, 'Visa alla')
 
-# Select only these columns for initial display
+# Välj endast dessa tre kolumner som ska visas
 ny_subset = subset[['headline', 'employer.workplace', 'description.text']]
 
-# Display the DataFrame
+# Visa DataFrame
 st.subheader('Lediga jobb')
 
 selected_place = st.selectbox("Välj region:", places_list)
@@ -241,7 +248,11 @@ filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 
-#HÄR HAR JAG ÄNDRAT
+#FRIDAS ÄNDRING START
+
+
+#FRIDAS ÄNDRING SLUT
+
 
 job_count = filtered_subset.shape[0]
 
@@ -249,20 +260,14 @@ st.markdown(f"<h1 style='font-weight: bold; color: green;'>{job_count} st </h1>"
 st.markdown("jobb matchar din sökning")
 
 
-
-
-###
-
-
-
-# Select only these columns
+# Välj endast dessa tre kolumner
 ny_subset = filtered_subset[[
     'headline',
     'employer.workplace',  
     'description.text'
 ]]
 
-# Title and text at the top
+# Titel och text högst upp
 st.subheader('Lediga jobb')
 
 
@@ -280,19 +285,21 @@ with temp.container():
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
+                    {"role": "system", "content": """Du är expert på att skriva snygga jobbannonser 
+                     och alla jobbanonser ska vara skrivna på samma sätt det vill säga med liknande rubriker och innehåll utan listor.
+                     """},
                     {"role": "user", "content": filtered_subset['description.text'].iloc[i]},
                 ]
             )
 
-            # Hämta och skriv ut den genererade omformulerade beskrivningen
+            #Hämta och skriv ut den genererade omformulerade beskrivningen
             for choice in response.choices:
                 simplified_description = choice.message.content
                 st.write(f"{simplified_description}")
 
 
 
-#Show more options
+#visa fler alternativ
 if len(ny_subset) > number:
     if st.button('Visa fler'):
         temp.empty()
@@ -310,29 +317,17 @@ if len(ny_subset) > number:
                         ]
                     )
 
-                    # Hämta och skriv ut den genererade omformulerade beskrivningen
+                    #Hämta och skriv ut den genererade omformulerade beskrivningen
                     for choice in response.choices:
                         simplified_description = choice.message.content
                         st.write(f"{simplified_description}")
                   
-
-
-                
-
-
-
-
 #selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
-
-
-
-
-
-
 
 st.write(filtered_subset)
 
 
+# Text längst ner på sidan
 st.markdown("---")
 st.subheader("Bakgrund till vårt projekt")
 st.markdown("I vårt projekt...")
