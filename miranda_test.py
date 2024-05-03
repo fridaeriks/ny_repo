@@ -268,7 +268,7 @@ def load_subset(dataset, amount):
     for i in range(min(len(dataset), amount)):
         with st.expander(f"{dataset['Rubrik'].iloc[i]}"):
             st.write(f"Arbetsgivare: {dataset['Arbetsgivare'].iloc[i]}")
-            #beskrivning = chat(client, dataset['Beskrivning'].iloc[i])
+            beskrivning = chat(client, dataset['Beskrivning'].iloc[i])
             st.write(f"Förenklad arbetsbeskrivning: {dataset['Beskrivning'].iloc[i]}")
 
 def refresh_subset(dataset):
