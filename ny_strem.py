@@ -112,8 +112,9 @@ else:
 
 print("Almost done!")
 
-# Titel och text högst upp
-st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
+# Titel och text högst upp 
+st.markdown("<h1 style='color: red; display: inline;'><span style='font-style: italic;'>ATH</span></h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
+
 
 st.markdown("Info om vårt projekt")
 st.markdown("---")
@@ -160,35 +161,31 @@ Tove@gmail.com
 # Text som ingår i om oss (sidopanel)
 om_oss = '...'
 
+# Text som ingår i bakgrund (sidopanel)
+bakgrund = '...'
+
 left_column = st.sidebar
 
-left_column.markdown("""
-<style>
-.left-column {
-    background-color: #f0f0f0;
-    width: 30%;
-    padding: 20px;
-    border-radius: 5px;
-}
-</style>
-""", unsafe_allow_html=True)
 
 # Texten i sidopanelen: annan text som vi kan lägga till
 left_column.markdown("### Fri text")
 left_column.markdown("Text...")
 
 # Vidare läsning i sidopanelen
-with left_column.expander("Vidare läsning"):
+with left_column.expander("📖 Vidare läsning"):
     st.write(vidare_lasning)
 
 # Kontaktuppgifter i sidopanelen
-with left_column.expander("Kontaktuppgifter"):
+with left_column.expander("📞 Kontaktuppgifter"):
     st.write(kontakt_uppgifter)
 
 # Om oss i sidopanelen
-with left_column.expander("Om oss"):
+with left_column.expander("👥 Om oss"):
     st.write(om_oss)
 
+# Bakgrund i sidopanelen
+with left_column.expander("📚 Projektets bakgrund"):
+    st.write(bakgrund) 
 
 #Tabell där man kan filtrera med båda rullistorna
 column_aliases = {
