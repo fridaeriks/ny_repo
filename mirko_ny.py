@@ -7,6 +7,9 @@ import os
 import requests
 import io
 import zipfile
+import nltk
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
 
 print("Running...")
 
@@ -112,6 +115,108 @@ else:
         print("Error:", e)
 
 print("Almost done!")
+
+
+
+# Ladda in nltk:s stemmingfunktion för svenska
+from nltk.stem.snowball import SnowballStemmer
+stemmer_sv = SnowballStemmer("swedish")
+
+# Ladda in stoppord för svenska från nltk
+from nltk.corpus import stopwords
+stop_words_sv = set(stopwords.words('swedish'))
+
+# Ladda in engelska stoppord för att hantera engelska texter
+stop_words_en = set(stopwords.words('english'))
+
+nltk.download('stopwords')
+
+# Ladda in punktuation från string
+import string
+punctuation = set(string.punctuation)
+
+# Select only relevant columns and make a copy to avoid SettingWithCopyWarning
+new_subset = subset[[
+    'headline',
+    'description.text'
+]].copy()
+
+# Define a function to preprocess text with stemming for both English and Swedish
+def preprocess_text(text, language='english'):
+    # Convert list of keywords to a single string and then convert to lowercase
+    if isinstance(text, list):
+        text = ' '.join(text)
+    # Convert text to lowercase
+    text = text.lower()
+    # Tokenize the text
+    tokens = nltk.word_tokenize(text)
+    # Remove stop words and punctuation based on language
+    if language == 'swedish':
+        stop_words = stop_words_sv
+        stemmer = stemmer_sv
+    else:
+        stop_words = stop_words_en
+        stemmer = SnowballStemmer("english")
+    tokens = [word for word in tokens if word not in stop_words and word not in punctuation]
+    # Stem the tokens
+    stemmed_tokens = [stemmer.stem(word) for word in tokens]
+    # Join the stemmed tokens back into a single string
+    text = ' '.join(stemmed_tokens)
+    return text
+
+# Apply text preprocessing with stemming
+#new_subset['combined_text'] = new_subset.apply(lambda row: preprocess_text(row['headline'] + ' ' + row['description.text'], language='swedish'), axis=1)
+new_subset['combined_text'] = new_subset.apply(lambda row: preprocess_text((row['headline'] if pd.notnull(row['headline']) else '') + ' ' + (row['description.text'] if pd.notnull(row['description.text']) else ''), language='swedish'), axis=1)
+
+
+# Justera vektoriseringen för att använda olika parametrar
+vectorizer = TfidfVectorizer(max_features=5000)
+X = vectorizer.fit_transform(new_subset['combined_text'])
+
+# Optimera antalet kluster med elbow method eller silhouette score
+from sklearn.metrics import silhouette_score
+import matplotlib.pyplot as plt
+
+max_clusters = 10  # Justera detta beroende på dina data
+silhouette_scores = []
+for num_clusters in range(2, max_clusters + 1):
+    kmeans = KMeans(n_clusters=num_clusters)
+    kmeans.fit(X)
+    silhouette_scores.append(silhouette_score(X, kmeans.labels_))
+
+# Plotta silhouette score för olika antal kluster
+plt.plot(range(2, max_clusters + 1), silhouette_scores)
+plt.xlabel('Antal kluster')
+plt.ylabel('Silhouette Score')
+plt.title('Silhouette Score för olika antal kluster')
+plt.show()
+
+# Antal kluster, inklusive "Lagerarbete och logistik" och "Övrigt"
+optimal_num_clusters = 7  # Justera detta baserat på din analys
+
+# Använd det optimala antalet kluster för att utföra klustringen
+kmeans = KMeans(n_clusters=optimal_num_clusters)
+kmeans.fit(X)
+
+# Manuellt tilldela namn till varje kluster baserat på de framträdande orden eller nyckelorden
+cluster_names = [
+    "Teknologi och IT",
+    "Hälsovård och medicin",
+    "Utbildning och pedagogik",
+    "Ekonomi och finans",
+    "Försäljning och marknadsföring",
+    "Lagerarbete och logistik",
+    "Övrigt"
+]
+
+# Lägg till en ny kolumn i DataFrame för branschnamn
+subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
+
+
+
+
+
+
 
 #Titel och text högst upp
 st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
@@ -256,11 +361,24 @@ if search_query:
 else:
     text_condition = pd.Series(True, index=df.index)  # Default condition to select all rows
 
+# Add a selectbox for industry sectors
+selected_industry = st.selectbox("Välj bransch:", ['Visa alla'] + cluster_names)
+
+# Update filtering logic to include selected industry
+if selected_industry == 'Visa alla':
+    industry_condition = subset['industry'].notna()
+else:
+    industry_condition = subset['industry'] == selected_industry
+
+
+
 # Filter DataFrame based on all conditions
 filtered_subset = df[(region_condition) & 
                      (time_of_work_condition) 
                      & (duration_condition) 
-                     & (text_condition)]
+                     & (text_condition)
+                     & (industry_condition)]
+
 job_count = filtered_subset.shape[0]
 
 #Visar hur många lediga jobba som finns
