@@ -186,10 +186,10 @@ cluster_names = [
 ]
 
 # Lägg till en ny kolumn i DataFrame för branschnamn
-new_subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
+subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 
 # Streamlit app
 st.title('Jobtech Dataset Clustering')
 # Display the DataFrame with cluster labels and industry names
-st.write(new_subset)
+st.write(subset)
 
