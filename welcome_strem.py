@@ -4,7 +4,7 @@ import subprocess
 
 st.markdown(
     """
-    <h3 style='text-align: center;'>Välkommen till PODIUM</h3>
+    <h3 style='text-align: center;'>Välkommen till SPORTEE</h3>
     """,
     unsafe_allow_html=True
 )
@@ -16,6 +16,7 @@ def run_main_app():
 
 st.write("")  # Lägger till lite extra utrymme
 col1, _, col2, _ = st.columns([1, 1, 6, 1])
+st.markdown ('         .   ')
 with col2:
-    if st.button("Starta podium"):
+    if st.button("Start"):
         run_main_app()
