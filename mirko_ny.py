@@ -117,7 +117,6 @@ else:
 print("Almost done!")
 
 
-
 # Ladda in nltk:s stemmingfunktion för svenska
 from nltk.stem.snowball import SnowballStemmer
 stemmer_sv = SnowballStemmer("swedish")
