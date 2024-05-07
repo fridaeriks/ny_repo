@@ -114,6 +114,7 @@ else:
 
 print("Almost done!")
 
+nltk.download('stopwords')
 
 # Ladda in nltk:s stemmingfunktion för svenska
 from nltk.stem.snowball import SnowballStemmer
@@ -125,6 +126,8 @@ stop_words_sv = set(stopwords.words('swedish'))
 
 # Ladda in engelska stoppord för att hantera engelska texter
 stop_words_en = set(stopwords.words('english'))
+
+nltk.download('stopwords')
 
 # Ladda in punktuation från string
 import string

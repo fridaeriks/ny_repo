@@ -158,6 +158,8 @@ Agenda and Report Administrator Tove Lennertsson
 Tove@gmail.com
 +46 0000000"""
 
+bakgrund = """Här kommer info om projektets bakgrund """
+
 left_column = st.sidebar.container()
 
 left_column.write("""
@@ -177,18 +179,21 @@ left_column.markdown("### Vi på ATH work")
 
                     #Vidare läsning i sidopanelen
 
-#Funkar inte men vill ha ett större mellanrum
-st.write("\n\n")
-
-with left_column.expander("Projektets bakgrund"):
+with left_column.expander("👥 Om oss"):
     st.write(om_oss)
 
-with left_column.expander("Vidare läsning"):
+# Vidare läsning i sidopanelen
+with left_column.expander("📖   Vidare läsning"):
     st.write(vidare_lasning)
 
-with left_column.expander("Kontaktuppgifter"):
+# Kontaktuppgifter i sidopanelen
+with left_column.expander("📞   Kontaktuppgifter"):
     st.info(kontakt_uppgifter)
 
+
+# Bakgrund i sidopanelen
+with left_column.expander("📚   Projektets bakgrund"):
+    st.write(bakgrund) 
 
                     #Tabell där man kan filtrera med båda rullistorna
 column_aliases = {
