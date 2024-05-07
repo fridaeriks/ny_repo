@@ -210,7 +210,7 @@ subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 
 # Titel och text högst upp
 st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
-=======
+
 # Titel och text högst upp 
 st.markdown("<h1 style='color: red; display: inline;'><span style='font-style: italic;'>ATH</span></h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
 

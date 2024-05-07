@@ -11,7 +11,7 @@ st.markdown(
 
 # Funktion för att köra den andra Streamlit-filen
 def run_main_app():
-    subprocess.Popen(["streamlit", "run", "ny_strem.py"])
+    subprocess.Popen(["streamlit", "run", "mirko_ny.py"])
 
 
 st.write("")  # Lägger till lite extra utrymme
@@ -20,3 +20,4 @@ st.markdown ('         .   ')
 with col2:
     if st.button("Start"):
         run_main_app()
+
