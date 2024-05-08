@@ -7,7 +7,7 @@ import os
 import requests
 import io
 import zipfile
-import nltk
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
@@ -114,6 +114,10 @@ else:
 
 print("Almost done!")
 
+import nltk
+print(nltk.data.path)
+
+#nltk.data.path.append("/path/to/nltk_data")
 nltk.download('stopwords')
 
 # Ladda in nltk:s stemmingfunktion för svenska
@@ -210,23 +214,13 @@ cluster_names = [
 # Lägg till en ny kolumn i DataFrame för branschnamn
 subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 
-
-# Titel och text högst upp
+#Miranda uppdatering 1
 st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
-
-# Titel och text högst upp 
-st.markdown("<h1 style='color: red; display: inline;'><span style='font-style: italic;'>ATH</span></h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
-
-
-st.markdown("Info om vårt projekt")
+st.markdown("Det ska vara lätt att hitta jobb för just dig!")
 st.markdown("---")
-st.write(subset)
 
+om_oss = (f'Vårt projekt arbete hamdlar om... Ett stort problem har upptäckts.... Vill lösa detta... Genom intervjuer etc...')
 
-
-# Grå sidopanel
-
-# Text som ingår i vidare läsning (sidopanel)
 vidare_lasning = """Text om vi vill ha...
 
 [Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om de 
@@ -238,57 +232,69 @@ handlar om hur idrottare, särskilt kvinnor och de i mindre populära idrottsgre
 kämpar med ekonomisk osäkerhet och måste kombinera sin idrottskarriär med andra jobb 
 för att klara ekonomin."""
 
-# Text som ingår i kontaktuppgifter (sidopanel)
 kontakt_uppgifter = """
-Python Consulant Vera Hertzman
+Python Consulant 
+Vera Hertzman
 Vera@outlook.com
-+46 0000000
++46 76 848 23 49
 
-Head of AI Thea Håkansson
+Head of AI 
+Thea Håkansson
 Thea@gmail.se
-+46 00000000
++46 73 747 87 45
 
-Head of Streamlit Frida Eriksson
+Head of Streamlit 
+Frida Eriksson
 Royal@yahoo.com
-+46 0000000
++46 76 432 38 49
 
-Project Coordinator Miranda Tham
+Project Coordinator 
+Miranda Tham
 Miranda@hotmail.com
-+46 0000000
++46 76 767 00 35
 
 Agenda and Report Administrator Tove Lennertsson
 Tove@gmail.com
 +46 0000000"""
 
-# Text som ingår i om oss (sidopanel)
-om_oss = '...'
+bakgrund = """Här kommer info om projektets bakgrund """
 
-# Text som ingår i bakgrund (sidopanel)
-bakgrund = '...'
+left_column = st.sidebar.container()
 
-left_column = st.sidebar
+left_column.write("""
+<style>
+.left-column {
+    background-color: #FF7F7F;
+    width: 30%;
+    padding: 20px;
+    border-radius: 5px;
+}
+</style>
+""", unsafe_allow_html=True)
 
+                    #Texten i sidopanelen: annan text som vi kan lägga till
+left_column.markdown("### Vi på ATH work")
+                     #left_column.markdown("Info om vårt projekt")
 
-# Texten i sidopanelen: annan text som vi kan lägga till
-left_column.markdown("### Fri text")
-left_column.markdown("Text...")
+                    #Vidare läsning i sidopanelen
 
-# Vidare läsning i sidopanelen
-with left_column.expander("📖 Vidare läsning"):
-    st.write(vidare_lasning)
-
-# Kontaktuppgifter i sidopanelen
-with left_column.expander("📞 Kontaktuppgifter"):
-    st.write(kontakt_uppgifter)
-
-# Om oss i sidopanelen
 with left_column.expander("👥 Om oss"):
     st.write(om_oss)
 
+# Vidare läsning i sidopanelen
+with left_column.expander("📖   Vidare läsning"):
+    st.write(vidare_lasning)
+
+# Kontaktuppgifter i sidopanelen
+with left_column.expander("📞   Kontaktuppgifter"):
+    st.info(kontakt_uppgifter)
+
+
 # Bakgrund i sidopanelen
-with left_column.expander("📚 Projektets bakgrund"):
+with left_column.expander("📚   Projektets bakgrund"):
     st.write(bakgrund) 
 
+                    #Tabell där man kan filtrera med båda rullistorna
 #Tabell där man kan filtrera med båda rullistorna
 column_aliases = {
     'headline': 'headline',
@@ -301,6 +307,7 @@ column_aliases = {
     'duration.label': 'duration.label'
 }
 
+df = pd.read_csv("subset.csv")
 
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
 places_list.insert(0, 'Visa alla')
@@ -312,15 +319,25 @@ time_of_work.insert(0, 'Visa alla')
 duration_time = subset['duration.label'].dropna().unique().tolist()
 duration_time.insert(0, 'Visa alla')
 
-
-
 # Visa DataFrame
 st.subheader('Lediga jobb')
 
-selected_place = st.selectbox("Välj region:", places_list)
-selected_time_of_work = st.selectbox("Välj anställningsform:", time_of_work)
-selected_duration_time = st.selectbox(f'Välj tidsomfattning', duration_time)
+search_query = st.text_input('Sök efter specifika ord:', value="", help="Jobbtitel, nyckelord eller företag etc",)
 
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+   selected_place = st.selectbox(f'Välj region:', places_list, help="Län i Sverige")
+
+with col2:
+   selected_time_of_work = st.selectbox(f'Välj anställningsform:', time_of_work)
+
+with col3:
+   selected_duration_time = st.selectbox(f'Välj tidsomfattning', duration_time)
+
+with col4:
+    # Add a selectbox for industry sectors
+    selected_industry = st.selectbox("Välj bransch:", ['Visa alla'] + cluster_names)
 
 if selected_place == 'Visa alla':
     region_condition = subset['workplace_address.region'].notna()
@@ -337,8 +354,10 @@ if selected_duration_time == 'Visa alla':
 else:
     duration_condition = subset['duration.label'] == selected_duration_time
 
-# Add a selectbox for industry sectors
-selected_industry = st.selectbox("Välj bransch:", ['Visa alla'] + cluster_names)
+if search_query:
+    text_condition = df['description.text'].str.contains(search_query, case=False, na=False)
+else:
+    text_condition = pd.Series(True, index=df.index)  # Default condition to select all rows
 
 # Update filtering logic to include selected industry
 if selected_industry == 'Visa alla':
@@ -358,12 +377,11 @@ filtered_subset = filtered_subset.rename(columns=column_aliases)
 
 #FRIDAS ÄNDRING START
 
-
-
 job_count = filtered_subset.shape[0]
 
+#Visar hur många lediga jobba som finns
 st.markdown(f"<h1 style='font-weight: bold; color: green;'>{job_count} st </h1>", unsafe_allow_html=True)
-st.markdown("jobb matchar din sökning")
+st.markdown("Jobb som matchar sökningen:")
 
 
 # Välj endast dessa tre kolumner
@@ -376,11 +394,7 @@ ny_subset = filtered_subset[[
 # Titel och text högst upp
 st.subheader('Lediga jobb')
 
-
-
-
-number = 2
- 
+number = 2 
 temp = st.empty()
 
 with temp.container():
@@ -402,7 +416,6 @@ with temp.container():
             for choice in response.choices:
                 simplified_description = choice.message.content
                 st.write(f"{simplified_description}")
-
 
 
 #visa fler alternativ
@@ -428,12 +441,35 @@ if len(ny_subset) > number:
                         simplified_description = choice.message.content
                         st.write(f"{simplified_description}")
                   
-#selected_ads = st.multiselect("Välj annonser att visa detaljer för:", ny_subset['Rubrik'])
-
-st.write(filtered_subset)
 
 
 # Text längst ner på sidan
 st.markdown("---")
 st.subheader("Bakgrund till vårt projekt")
 st.markdown("I vårt projekt...")
+
+
+
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    st.markdown("<h9 style='text-align:'>Frida Eriksson</h9>", unsafe_allow_html=True)
+    st.image('https://static.streamlit.io/examples/cat.jpg', width=100)
+
+with col2:
+    st.markdown("<h9 style='text-align:'>Miranda Tham</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=100)
+
+with col3:
+    st.markdown("<h9 style='text-align:'>Thea Håkansson</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=100)
+
+with col4:
+    st.markdown("<h9 style='text-align:'>Vera Hertzman</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=100)
+
+with col5:
+    st.markdown("<h9 style='text-align: center;'>Tove Lennartson</h9>" , unsafe_allow_html=True)
+    st.image('kat.jpg', width=100)
+
