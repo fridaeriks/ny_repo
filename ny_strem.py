@@ -114,6 +114,7 @@ else:
 
 print("Almost done!")
 
+nltk.download('stopwords')
 
 # Ladda in nltk:s stemmingfunktion för svenska
 from nltk.stem.snowball import SnowballStemmer
@@ -125,6 +126,8 @@ stop_words_sv = set(stopwords.words('swedish'))
 
 # Ladda in engelska stoppord för att hantera engelska texter
 stop_words_en = set(stopwords.words('english'))
+
+nltk.download('stopwords')
 
 # Ladda in punktuation från string
 import string
@@ -210,8 +213,8 @@ subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 
 # Titel och text högst upp
 st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
-# Titel och text högst upp 
-st.markdown("<h1 style='color: red; display: inline;'><span style='font-style: italic;'>ATH</span></h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
+
+
 
 
 st.markdown("Info om vårt projekt")
@@ -308,8 +311,7 @@ time_of_work.insert(0, 'Visa alla')
 duration_time = subset['duration.label'].dropna().unique().tolist()
 duration_time.insert(0, 'Visa alla')
 
-# Välj endast dessa tre kolumner som ska visas
-ny_subset = subset[['headline', 'employer.workplace', 'description.text']]
+
 
 # Visa DataFrame
 st.subheader('Lediga jobb')
@@ -355,8 +357,6 @@ filtered_subset = filtered_subset.rename(columns=column_aliases)
 
 #FRIDAS ÄNDRING START
 
-
-#FRIDAS ÄNDRING SLUT
 
 
 job_count = filtered_subset.shape[0]
