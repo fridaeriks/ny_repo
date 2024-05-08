@@ -115,6 +115,7 @@ else:
 print("Almost done!")
 
 
+
 #Titel och text högst upp
 st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")

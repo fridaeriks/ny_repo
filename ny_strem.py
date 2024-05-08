@@ -217,6 +217,7 @@ subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 #Miranda uppdatering 1
 st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")
+
 st.markdown("---")
 
 om_oss = (f'Vårt projekt arbete hamdlar om... Ett stort problem har upptäckts.... Vill lösa detta... Genom intervjuer etc...')
