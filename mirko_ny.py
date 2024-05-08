@@ -119,7 +119,7 @@ print("Almost done!")
 
 
 # Define the hover card inside the main content area
-ui.hover_card(label="För arbetsgivare", content="För arbetsgivare", content_type="text", key="hover_card_1")
+#ui.hover_card(label="För arbetsgivare", content="För arbetsgivare", content_type="text", key="hover_card_1")
 
 
 #Titel och text högst upp
