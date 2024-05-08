@@ -4,13 +4,10 @@ import streamlit as st
 import openai
 from openai import OpenAI
 import os
-import streamlit_shadcn_ui as ui
+#import streamlit_shadcn_ui as ui
 import requests
 import io
 import zipfile
-import nltk
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
 
 print("Running...")
 
@@ -117,9 +114,6 @@ else:
 
 print("Almost done!")
 
-
-# Define the hover card inside the main content area
-#ui.hover_card(label="För arbetsgivare", content="För arbetsgivare", content_type="text", key="hover_card_1")
 
 
 #Titel och text högst upp
