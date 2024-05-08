@@ -85,7 +85,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_vectorized, y, train_size=
 
 
 # Välj modell (Logistisk regression)
-model = LogisticRegression(max_iter=1000)
+model = LogisticRegression(max_iter=1000, class_weight='balanced')
 # Träna modellen
 model.fit(X_train, y_train)
 
