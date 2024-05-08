@@ -312,8 +312,7 @@ time_of_work.insert(0, 'Visa alla')
 duration_time = subset['duration.label'].dropna().unique().tolist()
 duration_time.insert(0, 'Visa alla')
 
-# Välj endast dessa tre kolumner som ska visas
-ny_subset = subset[['headline', 'employer.workplace', 'description.text']]
+
 
 # Visa DataFrame
 st.subheader('Lediga jobb')
