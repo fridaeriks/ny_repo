@@ -360,8 +360,6 @@ filtered_subset = filtered_subset.rename(columns=column_aliases)
 #FRIDAS ÄNDRING START
 
 
-#FRIDAS ÄNDRING SLUT
-
 
 job_count = filtered_subset.shape[0]
 
