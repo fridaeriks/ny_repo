@@ -225,11 +225,11 @@ subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 #--------------------------------------------------------------------------------------------------------------------------#
 
 #Miranda uppdatering 1
-st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
+st.image('logo2.jpg', width=180) 
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")
-
 st.markdown("---")
 
+#Den gråa sidopanelen
 om_oss = (f'Vårt projekt arbete hamdlar om... Ett stort problem har upptäckts.... Vill lösa detta... Genom intervjuer etc...')
 
 vidare_lasning = """Text om vi vill ha...
@@ -284,12 +284,12 @@ left_column.write("""
 """, unsafe_allow_html=True)
 
                     #Texten i sidopanelen: annan text som vi kan lägga till
-left_column.markdown("### Vi på ATH work")
+left_column.markdown("### Vi på <span style='color: #4a90e2;'>SPORTEE</span>", unsafe_allow_html=True)
                      #left_column.markdown("Info om vårt projekt")
 
                     #Vidare läsning i sidopanelen
 
-with left_column.expander("👥 Om oss"):
+with left_column.expander("💼 Om oss"):
     st.write(om_oss)
 
 # Vidare läsning i sidopanelen
@@ -297,12 +297,12 @@ with left_column.expander("📖   Vidare läsning"):
     st.write(vidare_lasning)
 
 # Kontaktuppgifter i sidopanelen
-with left_column.expander("📞   Kontaktuppgifter"):
+with left_column.expander("📫   Kontaktuppgifter"):
     st.info(kontakt_uppgifter)
 
 
 # Bakgrund i sidopanelen
-with left_column.expander("📚   Projektets bakgrund"):
+with left_column.expander("📋   Projektets bakgrund"):
     st.write(bakgrund) 
 
 
@@ -395,7 +395,7 @@ job_count = filtered_subset.shape[0]
 #--------------------------------------------------------------------------------------------------------------------------#
 
 #Visar hur många lediga jobba som finns
-st.markdown(f"<h1 style='font-weight: bold; color: green;'>{job_count} st </h1>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='font-weight: bold; color: #4a90e2'>{job_count} st </h1>", unsafe_allow_html=True)
 st.markdown("Jobb som matchar sökningen:")
 
 
@@ -574,11 +574,12 @@ sorted_df = df.sort_values(by='prediction', ascending=False)
 st.subheader("AI-generator")
 info = """Nedan listar en AI de tre bäst lämpade arbeten för elitidrottare. Dessa förslag har utvecklats utifrån en supervised model som tränats för att ge bästa möjliga rekommendation.
 
-Detta är endast en prototyp och inte en färdigt utvecklad modell.
-
-###Top tre:"""
+Detta är endast en prototyp och inte en färdigt utvecklad modell."""
 
 st.write(info)
+st.markdown("<h6 style='text-align:left;'>Top tre:</h6>", unsafe_allow_html=True)
+
+
 top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
 
 
@@ -604,31 +605,61 @@ for i in range(len(top_predictions)):
 
 
 #--------------------------------------------------------------------------------------------------------------------------#
-# Text längst ner på sidan
-st.markdown("---")
-st.subheader("Bakgrund till vårt projekt")
-st.markdown("I vårt projekt...")
 
 
-col1, col2, col3, col4, col5 = st.columns(5)
+#Panelen längst ner
+st.markdown('<br>', unsafe_allow_html=True)
+st.markdown(
+    """
+    <style>
+        .line {
+            width: 100%;
+            height: 2px;
+            background-color: black; 
+            margin-bottom: 20px;
+        }
+    </style>
+    <div class="line"></div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.markdown("<h9 style='text-align:'>Frida Eriksson</h9>", unsafe_allow_html=True)
-    st.image('https://static.streamlit.io/examples/cat.jpg', width=100)
+    st.markdown("<h6 style='text-align:left;'>Säkerhet</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Kundsäkerhet</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Hantering av kunduppgifter</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Falska mail</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Anmäl ett fel</h6>", unsafe_allow_html=True)
+    
 
 with col2:
-    st.markdown("<h9 style='text-align:'>Miranda Tham</h9>", unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
+    st.markdown("<h6 style='text-align:left;'>För föreingen</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Lägg till egen annons</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Ändra layout</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Visa alla jobb</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Inloggning för förenigar</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Administrera föreningsannonser</h6>", unsafe_allow_html=True)
 
 with col3:
-    st.markdown("<h9 style='text-align:'>Thea Håkansson</h9>", unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
+    st.markdown("<h6 style='text-align:left;'>Villkor</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Användarvillkor</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Personuppgiftshantering</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Cookies</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Cookiesinställningar</h6>", unsafe_allow_html=True)
 
 with col4:
-    st.markdown("<h9 style='text-align:'>Vera Hertzman</h9>", unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
+    st.markdown("<h6 style='text-align:left;'>SPORTEE</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Om SPORTEE</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Press</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Jobba på SPORTEE</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Kontakta oss</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Inspiration</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Tips och guider</h6>", unsafe_allow_html=True)
 
-with col5:
-    st.markdown("<h9 style='text-align: center;'>Tove Lennartson</h9>" , unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
+
+
 
