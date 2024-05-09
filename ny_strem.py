@@ -10,6 +10,9 @@ import zipfile
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
+import nltk
+nltk.download('punkt')
+
 
 #--------------------------------------------------------------------------------------------------------------------------#
 print("Running...")
@@ -232,16 +235,16 @@ st.markdown("---")
 
 om_oss = (f'Vårt projekt arbete hamdlar om... Ett stort problem har upptäckts.... Vill lösa detta... Genom intervjuer etc...')
 
-vidare_lasning = """Text om vi vill ha...
+vidare_lasning = """
+<span style="color: blue;">
+Rapporten Swedish Elite Sport handlar om de svenska idrottarnas ekonomiska utmaningar, i jämförelse med våra grannar Norge och Danmark. 
+Texten pekar på ett bristande svenskt idrottsstöd under utvecklingsfasen som har resulterat i den nuvarande ekonomiska osäkerheten 
+hos våra svenska idrottare.
+[Läs mer](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf)
 
-[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om de 
-ekonomiska utmaningarna för svenska idrottare i jämförelse med Norge och Danmark, 
-där texten ppekar på bristande stöd under utvecklingsfasen och den resulterande ekonomiska osäkerheten.
-
-[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) 
-handlar om hur idrottare, särskilt kvinnor och de i mindre populära idrottsgrenar, 
-kämpar med ekonomisk osäkerhet och måste kombinera sin idrottskarriär med andra jobb 
-för att klara ekonomin."""
+How 5 Athletes Afford to Stay in the Game and Still Make Rent är en amerikansk artikel som handlar om hur idrottare, 
+särskilt kvinnor och i de mindre populära idrottsgrenarna, globalt sett lever i en ekonomisk kamp och osäkerhet.
+[Läs mer](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html)</span>"""
 
 kontakt_uppgifter = """
 Python Consulant 
