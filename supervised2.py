@@ -130,13 +130,13 @@ import streamlit as st
 st.subheader("First few rows that best fit an athlete:")
 top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
 
-st.write(top_predictions)
+#st.write(top_predictions)
 
 # Loopa igenom varje rad och skriv ut informationen
 for index, row in top_predictions.iterrows():
     st.subheader(f"{row['headline']}")
     st.write(f"Text: {row['description.text']}")
-    st.write(f"Prediktion: {row['prediction']}")
+    #st.write(f"Prediktion: {row['prediction']}")
     st.write("-------------")
 
 
