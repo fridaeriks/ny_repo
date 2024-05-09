@@ -4,7 +4,6 @@ import streamlit as st
 import openai
 from openai import OpenAI
 import os
-#import streamlit_shadcn_ui as ui
 import requests
 import io
 import zipfile
@@ -128,8 +127,8 @@ st.markdown(
 )
 
 
+st.image('logo2.jpg', width=300)  
 
-st.image('logo2.jpg', width=180)  
 
 
 #Titel och text högst upp 
