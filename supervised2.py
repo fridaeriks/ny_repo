@@ -12,6 +12,10 @@ from nltk.stem import SnowballStemmer
 # Läs in data
 df = pd.read_csv('subset.csv').head(206)
 
+
+# Skapa en kopia av den ursprungliga kolumnen
+df['stemmed_text'] = df['description.text']
+
 # Ladda ned stoppord och lexikon för lemmatisering
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -35,8 +39,13 @@ def preprocess_text_column(column):
     
     return preprocessed_column
 
+
 # Preprocessa texten i kolumnen 'description.text'
-df['description.text'] = preprocess_text_column(df['description.text'])
+df['stemmed_text'] = preprocess_text_column(df['stemmed_text'])
+
+# Läs in 'Headline' från CSV-filen
+pd.read_csv('subset.csv')['headline'].head(206)
+
 
 # Funktion för att extrahera viktiga ord från jobbannonser
 def extract_manual_keywords():
@@ -80,12 +89,12 @@ df['label'] = labels[:len(df)]
 df_with_labels = df.dropna(subset=['label']).head(200)
 
 # Förutsatt att ditt dataset finns i en DataFrame df med kolumnen "description.text" för jobbannonserna och "label" för etiketten
-X = df_with_labels['description.text']
+X = df_with_labels['stemmed_text']
 y = df_with_labels['label']
 
 # Dela upp data i träningsdata och testdata
 # Dela upp data i träningsdata (150) och testdata (50) slumpmässigt
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=150, test_size=50, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=120, test_size=80, random_state=42)
 
 # Skapa TF-IDF-vektorer från text med samma vokabulär som användes för träning
 X_train_vectorized = vectorizer.fit_transform(X_train)
@@ -108,7 +117,7 @@ y_pred = model.predict(X_test_vectorized)
 print(classification_report(y_test, y_pred))
 
 # Förutsäg lämpligheten för varje jobbannons i ditt dataset
-df['prediction'] = model.predict(vectorizer.transform(df['description.text']))
+df['prediction'] = model.predict(vectorizer.transform(df['stemmed_text']))
 
 # Sortera DataFrame baserat på förutsägelserna för att få jobbannonserna i kronologisk ordning för vad som passar bäst med idrott
 sorted_df = df.sort_values(by='prediction', ascending=False)
@@ -119,11 +128,16 @@ print(sorted_df[['description.text', 'prediction']].head(3))
 import streamlit as st
 
 st.subheader("First few rows that best fit an athlete:")
-top_predictions = sorted_df[['description.text', 'prediction']].head(3)
+top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
+
+st.write(top_predictions)
 
 # Loopa igenom varje rad och skriv ut informationen
 for index, row in top_predictions.iterrows():
-    st.write(f"Beskrivning: {row['description.text']}")
+    st.subheader(f"{row['headline']}")
+    st.write(f"Text: {row['description.text']}")
     st.write(f"Prediktion: {row['prediction']}")
     st.write("-------------")
+
+
 
