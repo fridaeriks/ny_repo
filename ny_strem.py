@@ -45,6 +45,7 @@ for attempt in range(3):
 
 #--------------------------------------------------------------------------------------------------------------------------#
 
+#API nyckel 
 API_KEY = open('Open_AI_key', 'r').read()
 
 client = OpenAI(
@@ -65,6 +66,7 @@ openai.api_key = api_key
 if os.path.isfile('subset.csv'):
     # Om CSV-filen finns, läs in den i DataFrame
     subset = pd.read_csv('subset.csv')
+#Annars ladda ner den :)    
 else:
     # Ladda upp JASONL filen in i vår DataFrame
     lines = []
@@ -154,7 +156,7 @@ new_subset = subset[[
     'description.text'
 ]].copy()
 
-# Define a function to preprocess text with stemming for both English and Swedish
+#En funktion för att förbereada...
 def preprocess_text(text, language='english'):
     # Convert list of keywords to a single string and then convert to lowercase
     if isinstance(text, list):
@@ -503,7 +505,7 @@ with vera:
 with tove:
     st.markdown("<h9 style='text-align: center;'>Tove Lennartsson</h9>" , unsafe_allow_html=True)
     st.image('kat.jpg', width=100)
-=======
+
 st.markdown("---")                  
 #--------------------------------------------------------------------------------------------------------------------------#
 
@@ -631,7 +633,7 @@ st.markdown("<h6 style='text-align:left;'>Top tre:</h6>", unsafe_allow_html=True
 top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
 
 
-
+#Gpt genererade förslag utifrån filter
 for i in range(len(top_predictions)):
         with st.expander(f"{top_predictions['headline'].iloc[i]}"):
             st.write("-------------------------------------------------")
