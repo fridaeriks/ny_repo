@@ -127,9 +127,7 @@ st.markdown(
 )
 
 
-st.image('logo2.jpg', width=300)  
-
-
+st.image('logo2.jpg', width=180)  
 
 #Titel och text högst upp 
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")
@@ -191,7 +189,7 @@ left_column.write("""
 """, unsafe_allow_html=True)
 
                     #Texten i sidopanelen: annan text som vi kan lägga till
-left_column.markdown("### Vi på ATH work")
+left_column.markdown("### Vi på SPORTEE")
                      #left_column.markdown("Info om vårt projekt")
 
                     #Vidare läsning i sidopanelen

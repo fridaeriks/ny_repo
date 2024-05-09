@@ -7,10 +7,14 @@ import os
 import requests
 import io
 import zipfile
-
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
+import nltk
+nltk.download('punkt')
+
+
+#--------------------------------------------------------------------------------------------------------------------------#
 print("Running...")
 
 # Försök hämta data med maximalt 3 försök
@@ -39,6 +43,8 @@ for attempt in range(3):
     except Exception as e:
         print("Error:", e)
 
+#--------------------------------------------------------------------------------------------------------------------------#
+
 API_KEY = open('Open_AI_key', 'r').read()
 
 client = OpenAI(
@@ -51,6 +57,9 @@ with open("Open_AI_key", "r") as file:
 
 # Ange din API-nyckel
 openai.api_key = api_key
+
+
+#--------------------------------------------------------------------------------------------------------------------------#
 
 # Kontrollera om CSV-filen finns
 if os.path.isfile('subset.csv'):
@@ -113,6 +122,8 @@ else:
         print("Error:", e)
 
 print("Almost done!")
+
+#--------------------------------------------------------------------------------------------------------------------------#
 
 import nltk
 print(nltk.data.path)
@@ -214,6 +225,7 @@ cluster_names = [
 # Lägg till en ny kolumn i DataFrame för branschnamn
 subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 
+
 #Fråga oss pratbubbla
 st.markdown(
     """
@@ -229,23 +241,26 @@ st.markdown(
 st.image('logo2.jpg', width=300)  
 
 #Huvud titel 
-#st.markdown("<h1 style='color: red; display: inline;'>ATH</h1><h1 style='color: black; display: inline;'>WORK</h1>", unsafe_allow_html=True)
-st.markdown("Det ska vara lätt att hitta jobb för just dig!")
 
+#--------------------------------------------------------------------------------------------------------------------------#
+
+
+st.markdown("Det ska vara lätt att hitta jobb för just dig!")
 st.markdown("---")
 
+#Den gråa sidopanelen
 om_oss = (f'Vårt projekt arbete hamdlar om... Ett stort problem har upptäckts.... Vill lösa detta... Genom intervjuer etc...')
 
-vidare_lasning = """Text om vi vill ha...
+vidare_lasning = """
+<span style="color: blue;">
+Rapporten Swedish Elite Sport handlar om de svenska idrottarnas ekonomiska utmaningar, i jämförelse med våra grannar Norge och Danmark. 
+Texten pekar på ett bristande svenskt idrottsstöd under utvecklingsfasen som har resulterat i den nuvarande ekonomiska osäkerheten 
+hos våra svenska idrottare.
+[Läs mer](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf)
 
-[Swedish Elite Sport](https://www.idan.dk/media/stgjthhj/swedish-elite-sport.pdf) handlar om de 
-ekonomiska utmaningarna för svenska idrottare i jämförelse med Norge och Danmark, 
-där texten ppekar på bristande stöd under utvecklingsfasen och den resulterande ekonomiska osäkerheten.
-
-[How 5 Athletes Afford to Stay in the Game and Still Make Rent](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html) 
-handlar om hur idrottare, särskilt kvinnor och de i mindre populära idrottsgrenar, 
-kämpar med ekonomisk osäkerhet och måste kombinera sin idrottskarriär med andra jobb 
-för att klara ekonomin."""
+How 5 Athletes Afford to Stay in the Game and Still Make Rent är en amerikansk artikel som handlar om hur idrottare, 
+särskilt kvinnor och i de mindre populära idrottsgrenarna, globalt sett lever i en ekonomisk kamp och osäkerhet.
+[Läs mer](https://www.thecut.com/2024/01/pro-athletes-working-second-jobs-careers.html)</span>"""
 
 kontakt_uppgifter = """
 Python Consulant 
@@ -289,12 +304,12 @@ left_column.write("""
 """, unsafe_allow_html=True)
 
                     #Texten i sidopanelen: annan text som vi kan lägga till
-left_column.markdown("### Vi på ATH work")
+left_column.markdown("### Vi på <span style='color: #4a90e2;'>SPORTEE</span>", unsafe_allow_html=True)
                      #left_column.markdown("Info om vårt projekt")
 
                     #Vidare läsning i sidopanelen
 
-with left_column.expander("👥 Om oss"):
+with left_column.expander("💼 Om oss"):
     st.write(om_oss)
 
 # Vidare läsning i sidopanelen
@@ -302,15 +317,17 @@ with left_column.expander("📖   Vidare läsning"):
     st.write(vidare_lasning)
 
 # Kontaktuppgifter i sidopanelen
-with left_column.expander("📞   Kontaktuppgifter"):
+with left_column.expander("📫   Kontaktuppgifter"):
     st.info(kontakt_uppgifter)
 
 
 # Bakgrund i sidopanelen
-with left_column.expander("📚   Projektets bakgrund"):
+with left_column.expander("📋   Projektets bakgrund"):
     st.write(bakgrund) 
 
-                    #Tabell där man kan filtrera med båda rullistorna
+
+#--------------------------------------------------------------------------------------------------------------------------#
+
 #Tabell där man kan filtrera med båda rullistorna
 column_aliases = {
     'headline': 'headline',
@@ -340,6 +357,7 @@ st.subheader('Lediga jobb')
 search_query = st.text_input('Sök efter specifika ord:', value="", help="Jobbtitel, nyckelord eller företag etc",)
 
 region, form, time, branch = st.columns(4)
+
 
 with region:
    selected_place = st.selectbox(f'Välj region:', places_list, help="Län i Sverige")
@@ -388,10 +406,13 @@ filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 
+
 job_count = filtered_subset.shape[0]
 
+#--------------------------------------------------------------------------------------------------------------------------#
+
 #Visar hur många lediga jobba som finns
-st.markdown(f"<h1 style='font-weight: bold; color: green;'>{job_count} st </h1>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='font-weight: bold; color: #4a90e2'>{job_count} st </h1>", unsafe_allow_html=True)
 st.markdown("Jobb som matchar sökningen:")
 
 
@@ -453,7 +474,7 @@ if len(ny_subset) > number:
                     for choice in response.choices:
                         simplified_description = choice.message.content
                         st.write(f"{simplified_description}")
-                  
+
 
 # Text längst ner på sidan
 st.markdown("---")
@@ -482,6 +503,156 @@ with vera:
 with tove:
     st.markdown("<h9 style='text-align: center;'>Tove Lennartsson</h9>" , unsafe_allow_html=True)
     st.image('kat.jpg', width=100)
+=======
+st.markdown("---")                  
+#--------------------------------------------------------------------------------------------------------------------------#
+
+#SUPERVISED LEARNING
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import SnowballStemmer
+
+# Ladda ned stoppord och lexikon för lemmatisering
+nltk.download('stopwords')
+nltk.download('punkt')
+
+
+# Läs in data
+df = pd.read_csv('subset.csv').head(206)
+# Läs in 'Headline' från CSV-filen
+pd.read_csv('subset.csv')['headline'].head(206)
+
+
+# Skapa en kopia av den ursprungliga kolumnen
+df['stemmed_text'] = df['description.text']
+
+# Definiera stoppord
+swedish_stop_words = set(stopwords.words('swedish'))
+# Skapa en instans av SnowballStemmer för svenska
+stemmer = SnowballStemmer('swedish')
+
+# Funktion för textpreprocessering för en specifik kolumn
+def preprocess_text_column(column):
+    # Tokenisera texten i kolumnen
+    column_tokens = [word_tokenize(text.lower(), language='swedish') for text in column]
+    # Ta bort stoppord och ord med en längd mindre än 3, samt stamma ord
+    preprocessed_column = []
+    for tokens in column_tokens:
+        filtered_tokens = [stemmer.stem(token) for token in tokens if token not in swedish_stop_words and len(token) > 2 and token.isalpha()]
+        preprocessed_column.append(' '.join(filtered_tokens))
+    
+    return preprocessed_column
+
+
+# Preprocessa texten i kolumnen 'description.text'
+df['stemmed_text'] = preprocess_text_column(df['stemmed_text'])
+
+
+# Funktion för att extrahera viktiga ord från jobbannonser
+def extract_manual_keywords():
+    # Lista över manuellt valda viktiga ord
+    manual_keywords = ["tävlingsinriktad", "35 timmar", "flexibelt arbete", "deltid", "extra personal"]
+    
+    return manual_keywords
+# Extrahera de manuellt valda viktiga orden
+manual_keywords = extract_manual_keywords()
+# Lägg till de manuellt valda viktiga orden i vokabulären för TF-IDF-vektoriseringen
+vectorizer = TfidfVectorizer(vocabulary=manual_keywords)
+
+
+# Manuellt märkta etiketter för de första 200 raderna
+labels = ["NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ",
+          "NEJ", "NEJ", "JA", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "JA",
+          "NEJ", "JA", "NEJ", "NEJ", "JA", "NEJ", "NEJ", "NEJ", "JA", "JA",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "JA", "NEJ", "NEJ", "NEJ", 
+          "NEJ", "JA", "JA", "JA", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ",
+          "NEJ", "NEJ", "JA", "NEJ", "JA", "NEJ", "JA", "NEJ", "NEJ", "NEJ",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "JA",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ",
+          "JA", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "JA", "JA", "JA", "NEJ",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "JA", "JA", "JA", "JA", "JA",
+          "JA", "JA", "JA", "JA", "JA", "JA", "JA", "JA", "JA", "JA", "JA", "JA",
+          "JA", "NEJ", "NEJ", "JA", "JA", "NEJ", "NEJ", "NEJ", "NEJ", "JA", "NEJ",
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "JA", "NEJ", "JA", "NEJ", "JA", "NEJ", 
+          "NEJ", "JA", "NEJ", "JA", "NEJ", "NEJ", "NEJ", "JA", "JA", "NEJ", "NEJ", 
+          "NEJ", "NEJ", "NEJ", "NEJ", "JA", "NEJ", "JA", "JA", "NEJ", "NEJ", "NEJ", 
+          "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "NEJ", "JA", "NEJ", "NEJ", "NEJ", 
+          "NEJ", "NEJ", "JA", "JA", "NEJ", "JA", "JA", "NEJ"]
+
+# Skapa en ny kolumn med namnet "label" och tilldela den dina manuellt märkta etiketter
+df['label'] = labels[:len(df)]
+# Ta bara de första 200 raderna som har en etikett
+df_with_labels = df.dropna(subset=['label']).head(200)
+
+# Förutsatt att ditt dataset finns i en DataFrame df med kolumnen "description.text" för jobbannonserna och "label" för etiketten
+X = df_with_labels['stemmed_text']
+y = df_with_labels['label']
+
+# Dela upp data i träningsdata och testdata
+# Dela upp data i träningsdata (150) och testdata (50) slumpmässigt
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=120, test_size=80, random_state=42)
+# Skapa TF-IDF-vektorer från text med samma vokabulär som användes för träning
+X_train_vectorized = vectorizer.fit_transform(X_train)
+# Använd samma vektoriseringsinstans för att transformera testdatan
+X_test_vectorized = vectorizer.transform(X_test)
+
+# Välj modell (Logistisk regression) och ange viktade klasser
+model = LogisticRegression(max_iter=1000, class_weight={'NEJ': 1, 'JA': 10})
+
+# Träna modellen
+model.fit(X_train_vectorized, y_train)
+# Förutsäg på testdata
+y_pred = model.predict(X_test_vectorized)
+# Utvärdera modellens prestanda
+print(classification_report(y_test, y_pred))
+# Förutsäg lämpligheten för varje jobbannons i ditt dataset
+df['prediction'] = model.predict(vectorizer.transform(df['stemmed_text']))
+# Sortera DataFrame baserat på förutsägelserna för att få jobbannonserna i kronologisk ordning för vad som passar bäst med idrott
+sorted_df = df.sort_values(by='prediction', ascending=False)
+
+st.subheader("AI-generator")
+info = """Nedan listar en AI de tre bäst lämpade arbeten för elitidrottare. Dessa förslag har utvecklats utifrån en supervised model som tränats för att ge bästa möjliga rekommendation.
+
+Detta är endast en prototyp och inte en färdigt utvecklad modell."""
+
+st.write(info)
+st.markdown("<h6 style='text-align:left;'>Top tre:</h6>", unsafe_allow_html=True)
+
+
+top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
+
+
+
+for i in range(len(top_predictions)):
+        with st.expander(f"{top_predictions['headline'].iloc[i]}"):
+            st.write("-------------------------------------------------")
+            # Anropa OpenAI för att omformulera beskrivningstexten
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": """Du är expert på att skriva snygga jobbannonser 
+                     och alla jobbanonser ska vara skrivna på samma sätt det vill säga med liknande rubriker och innehåll utan listor.
+                     """},
+                    {"role": "user", "content": top_predictions['description.text'].iloc[i]},
+                ]
+            )
+
+            #Hämta och skriv ut den genererade omformulerade beskrivningen
+            for choice in response.choices:
+                simplified_description = choice.message.content
+                st.write(f"{simplified_description}")
+
+
+#--------------------------------------------------------------------------------------------------------------------------#
 
 
 #Panelen längst ner
