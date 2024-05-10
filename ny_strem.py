@@ -11,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
 import nltk
+import ssl
 nltk.download('punkt')
 
 
@@ -45,6 +46,7 @@ for attempt in range(3):
 
 #--------------------------------------------------------------------------------------------------------------------------#
 
+#API nyckel 
 API_KEY = open('Open_AI_key', 'r').read()
 
 client = OpenAI(
@@ -65,6 +67,7 @@ openai.api_key = api_key
 if os.path.isfile('subset.csv'):
     # Om CSV-filen finns, läs in den i DataFrame
     subset = pd.read_csv('subset.csv')
+#Annars ladda ner den :)    
 else:
     # Ladda upp JASONL filen in i vår DataFrame
     lines = []
@@ -154,7 +157,7 @@ new_subset = subset[[
     'description.text'
 ]].copy()
 
-# Define a function to preprocess text with stemming for both English and Swedish
+#En funktion för att förbereada...
 def preprocess_text(text, language='english'):
     # Convert list of keywords to a single string and then convert to lowercase
     if isinstance(text, list):
@@ -210,6 +213,7 @@ optimal_num_clusters = 7  # Justera detta baserat på din analys
 # Använd det optimala antalet kluster för att utföra klustringen
 kmeans = KMeans(n_clusters=optimal_num_clusters)
 kmeans.fit(X)
+
 
 # Manuellt tilldela namn till varje kluster baserat på de framträdande orden eller nyckelorden
 cluster_names = [
@@ -432,7 +436,9 @@ temp = st.empty()
 
 #resultaten som visas
 with temp.container():
+    print("Laddar gpt")
     for i in range(min(len(ny_subset), number)):
+        print(f'#{i}')
         with st.expander(f"Jobbannons {i+1} - {ny_subset['headline'].iloc[i]}"):
             st.write("-------------------------------------------------")
             # Anropa OpenAI för att omformulera beskrivningstexten
@@ -476,35 +482,7 @@ if len(ny_subset) > number:
                         st.write(f"{simplified_description}")
 
 
-# Text längst ner på sidan
-st.markdown("---")
-st.subheader("Vi på SPORTEE")
-st.markdown("I vårt projekt...")
-
-#Bilder på oss i gruppen
-frida, miranda, thea, vera, tove = st.columns(5)
-
-with frida:
-    st.markdown("<h9 style='text-align:'>Frida Eriksson</h9>", unsafe_allow_html=True)
-    st.image('https://static.streamlit.io/examples/cat.jpg', width=100)
-
-with miranda:
-    st.markdown("<h9 style='text-align:'>Miranda Tham</h9>", unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
-
-with thea:
-    st.markdown("<h9 style='text-align:'>Thea Håkansson</h9>", unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
-
-with vera:
-    st.markdown("<h9 style='text-align:'>Vera Hertzman</h9>", unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
-
-with tove:
-    st.markdown("<h9 style='text-align: center;'>Tove Lennartsson</h9>" , unsafe_allow_html=True)
-    st.image('kat.jpg', width=100)
-=======
-st.markdown("---")                  
+               
 #--------------------------------------------------------------------------------------------------------------------------#
 
 #SUPERVISED LEARNING
@@ -631,7 +609,7 @@ st.markdown("<h6 style='text-align:left;'>Top tre:</h6>", unsafe_allow_html=True
 top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
 
 
-
+#Gpt genererade förslag utifrån filter
 for i in range(len(top_predictions)):
         with st.expander(f"{top_predictions['headline'].iloc[i]}"):
             st.write("-------------------------------------------------")
@@ -654,6 +632,32 @@ for i in range(len(top_predictions)):
 
 #--------------------------------------------------------------------------------------------------------------------------#
 
+# Text längst ner på sidan
+st.markdown("---")
+st.subheader("Vi på SPORTEE")
+
+#Bilder på oss i gruppen
+frida, miranda, thea, vera, tove = st.columns(5)
+
+with frida:
+    st.markdown("<h9 style='text-align:'>Frida Eriksson</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=70)
+
+with miranda:
+    st.markdown("<h9 style='text-align:'>Miranda Tham</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=80)
+
+with thea:
+    st.markdown("<h9 style='text-align:'>Thea Håkansson</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=80)
+
+with vera:
+    st.markdown("<h9 style='text-align:'>Vera Hertzman</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=80)
+
+with tove:
+    st.markdown("<h9 style='text-align: center;'>Tove Lennartsson</h9>" , unsafe_allow_html=True)
+    st.image('kat.jpg', width=80) 
 
 #Panelen längst ner
 st.markdown(
