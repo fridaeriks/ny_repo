@@ -11,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
 import nltk
+import ssl
 nltk.download('punkt')
 
 
@@ -45,6 +46,7 @@ for attempt in range(3):
 
 #--------------------------------------------------------------------------------------------------------------------------#
 
+#API nyckel 
 API_KEY = open('Open_AI_key', 'r').read()
 
 client = OpenAI(
@@ -65,6 +67,7 @@ openai.api_key = api_key
 if os.path.isfile('subset.csv'):
     # Om CSV-filen finns, läs in den i DataFrame
     subset = pd.read_csv('subset.csv')
+#Annars ladda ner den :)    
 else:
     # Ladda upp JASONL filen in i vår DataFrame
     lines = []
@@ -154,7 +157,7 @@ new_subset = subset[[
     'description.text'
 ]].copy()
 
-# Define a function to preprocess text with stemming for both English and Swedish
+#En funktion för att förbereada...
 def preprocess_text(text, language='english'):
     # Convert list of keywords to a single string and then convert to lowercase
     if isinstance(text, list):
@@ -211,6 +214,7 @@ optimal_num_clusters = 7  # Justera detta baserat på din analys
 kmeans = KMeans(n_clusters=optimal_num_clusters)
 kmeans.fit(X)
 
+
 # Manuellt tilldela namn till varje kluster baserat på de framträdande orden eller nyckelorden
 cluster_names = [
     "Teknologi och IT",
@@ -225,10 +229,26 @@ cluster_names = [
 # Lägg till en ny kolumn i DataFrame för branschnamn
 subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
 
+
+#Fråga oss pratbubbla
+st.markdown(
+    """
+    <div style="position: fixed; bottom: 20px; right: 20px; width: 90px; height: 40px; background-color: rgba(240, 240, 240, 0.8); border-radius: 10px; padding: 10px; display: flex; justify-content: center; align-items: center;">
+        <div style="position: absolute; top: 50%; left: 100%; margin-top: -10px; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 10px solid rgba(240, 240, 240, 0.8);"></div>
+        <p style="margin: 0; color: #333;">Fråga oss!</p>
+    </div> 
+    """,
+    unsafe_allow_html=True
+)
+
+#Vår logga
+st.image('logo2.jpg', width=300)  
+
+#Huvud titel 
+
 #--------------------------------------------------------------------------------------------------------------------------#
 
-#Miranda uppdatering 1
-st.image('logo2.jpg', width=180) 
+
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")
 st.markdown("---")
 
@@ -275,6 +295,7 @@ bakgrund = """Här kommer info om projektets bakgrund """
 
 left_column = st.sidebar.container()
 
+#Vänstra kolumnen
 left_column.write("""
 <style>
 .left-column {
@@ -328,32 +349,33 @@ df = pd.read_csv("subset.csv")
 places_list = subset['workplace_address.region'].dropna().unique().tolist()
 places_list.insert(0, 'Visa alla')
 
-
 time_of_work = subset['working_hours_type.label'].dropna().unique().tolist()
 time_of_work.insert(0, 'Visa alla')
 
 duration_time = subset['duration.label'].dropna().unique().tolist()
 duration_time.insert(0, 'Visa alla')
 
-# Visa DataFrame
+# Visa titel 
 st.subheader('Lediga jobb')
 
 search_query = st.text_input('Sök efter specifika ord:', value="", help="Jobbtitel, nyckelord eller företag etc",)
 
-col1, col2, col3, col4 = st.columns(4)
+region, form, time, branch = st.columns(4)
 
-with col1:
-   selected_place = st.selectbox(f'Välj region:', places_list)
 
-with col2:
+with region:
+   selected_place = st.selectbox(f'Välj region:', places_list, help="Län i Sverige")
+
+with form:
    selected_time_of_work = st.selectbox(f'Välj anställningsform:', time_of_work)
 
-with col3:
+with time:
    selected_duration_time = st.selectbox(f'Välj tidsomfattning', duration_time)
 
-with col4:
+with branch:
     # Add a selectbox for industry sectors
     selected_industry = st.selectbox("Välj bransch:", ['Visa alla'] + cluster_names)
+
 
 if selected_place == 'Visa alla':
     region_condition = subset['workplace_address.region'].notna()
@@ -375,7 +397,6 @@ if search_query:
 else:
     text_condition = pd.Series(True, index=df.index)  # Default condition to select all rows
 
-# Update filtering logic to include selected industry
 if selected_industry == 'Visa alla':
     industry_condition = subset['industry'].notna()
 else:
@@ -383,15 +404,12 @@ else:
 
 # Filtered subset based on all conditions
 filtered_subset = subset[(region_condition) & (time_of_work_condition) & (duration_condition) & (industry_condition)]
-
-
 filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_vacancies', 'description.text', 
                                    'working_hours_type.label', 'workplace_address.region', 
                                    'workplace_address.municipality', 'duration.label', 'industry']]
 
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
 
-#--------------------------------------------------------------------------------------------------------------------------#
 
 job_count = filtered_subset.shape[0]
 
@@ -412,11 +430,15 @@ ny_subset = filtered_subset[[
 # Titel och text högst upp
 st.subheader('Lediga jobb')
 
+#antalet jobb
 number = 2 
 temp = st.empty()
 
+#resultaten som visas
 with temp.container():
+    print("Laddar gpt")
     for i in range(min(len(ny_subset), number)):
+        print(f'#{i}')
         with st.expander(f"Jobbannons {i+1} - {ny_subset['headline'].iloc[i]}"):
             st.write("-------------------------------------------------")
             # Anropa OpenAI för att omformulera beskrivningstexten
@@ -459,7 +481,8 @@ if len(ny_subset) > number:
                         simplified_description = choice.message.content
                         st.write(f"{simplified_description}")
 
-st.markdown("---")                  
+
+               
 #--------------------------------------------------------------------------------------------------------------------------#
 
 #SUPERVISED LEARNING
@@ -586,7 +609,7 @@ st.markdown("<h6 style='text-align:left;'>Top tre:</h6>", unsafe_allow_html=True
 top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
 
 
-
+#Gpt genererade förslag utifrån filter
 for i in range(len(top_predictions)):
         with st.expander(f"{top_predictions['headline'].iloc[i]}"):
             st.write("-------------------------------------------------")
@@ -609,16 +632,41 @@ for i in range(len(top_predictions)):
 
 #--------------------------------------------------------------------------------------------------------------------------#
 
+# Text längst ner på sidan
+st.markdown("---")
+st.subheader("Vi på SPORTEE")
+
+#Bilder på oss i gruppen
+frida, miranda, thea, vera, tove = st.columns(5)
+
+with frida:
+    st.markdown("<h9 style='text-align:'>Frida Eriksson</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=70)
+
+with miranda:
+    st.markdown("<h9 style='text-align:'>Miranda Tham</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=80)
+
+with thea:
+    st.markdown("<h9 style='text-align:'>Thea Håkansson</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=80)
+
+with vera:
+    st.markdown("<h9 style='text-align:'>Vera Hertzman</h9>", unsafe_allow_html=True)
+    st.image('kat.jpg', width=80)
+
+with tove:
+    st.markdown("<h9 style='text-align: center;'>Tove Lennartsson</h9>" , unsafe_allow_html=True)
+    st.image('kat.jpg', width=80) 
 
 #Panelen längst ner
-st.markdown('<br>', unsafe_allow_html=True)
 st.markdown(
     """
     <style>
         .line {
             width: 100%;
-            height: 2px;
-            background-color: black; 
+            height: 4px;
+            background-color: black; /* Navy färg */
             margin-bottom: 20px;
         }
     </style>
@@ -627,11 +675,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+#Info längst ner i kolumner
+safety, ass, terms, sportee = st.columns(4)
 
-
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
+with safety:
     st.markdown("<h6 style='text-align:left;'>Säkerhet</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Kundsäkerhet</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Hantering av kunduppgifter</h6>", unsafe_allow_html=True)
@@ -639,7 +686,7 @@ with col1:
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Anmäl ett fel</h6>", unsafe_allow_html=True)
     
 
-with col2:
+with ass:
     st.markdown("<h6 style='text-align:left;'>För föreingen</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Lägg till egen annons</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Ändra layout</h6>", unsafe_allow_html=True)
@@ -647,14 +694,16 @@ with col2:
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Inloggning för förenigar</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Administrera föreningsannonser</h6>", unsafe_allow_html=True)
 
-with col3:
+
+with terms:
     st.markdown("<h6 style='text-align:left;'>Villkor</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Användarvillkor</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Personuppgiftshantering</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Cookies</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Cookiesinställningar</h6>", unsafe_allow_html=True)
 
-with col4:
+
+with sportee:
     st.markdown("<h6 style='text-align:left;'>SPORTEE</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Om SPORTEE</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Press</h6>", unsafe_allow_html=True)
@@ -662,7 +711,4 @@ with col4:
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Kontakta oss</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Inspiration</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Tips och guider</h6>", unsafe_allow_html=True)
-
-
-
 
