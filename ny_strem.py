@@ -24,7 +24,8 @@ import matplotlib.pyplot as plt
 
 #--------------------------------------------------------------------------------------------------------------------------#
 print("Running...")
-
+#Vår logga
+st.image('logo2.jpg', width=300)  
 
 #Den gråa sidopanelen
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")
@@ -124,7 +125,6 @@ with open("Open_AI_key", "r") as file:
 # Ange din API-nyckel
 openai.api_key = api_key
 
-
 #--------------------------------------------------------------------------------------------------------------------------#
 
 @st.cache_data
@@ -136,29 +136,21 @@ def read_csv_file():
 # Load data using @st.cache
 subset = read_csv_file()
 
-# Om CSV-filen finns, läs in den i DataFrame
-#subset = pd.read_csv('subset.csv')
-
-
 print("Almost done!")
 
 #--------------------------------------------------------------------------------------------------------------------------#
 #CLUSTERING
 
-#nltk.data.path.append("/path/to/nltk_data")
-nltk.download('stopwords')
-nltk.download('punkt')
+
+#nltk.download('stopwords')
+#nltk.download('punkt')
 
 # Ladda in nltk:s stemmingfunktion för svenska
 stemmer_sv = SnowballStemmer("swedish")
-
 # Ladda in stoppord för svenska från nltk
 stop_words_sv = set(stopwords.words('swedish'))
-
 # Ladda in engelska stoppord för att hantera engelska texter
 stop_words_en = set(stopwords.words('english'))
-
-
 # Ladda in punktuation från string
 punctuation = set(string.punctuation)
 
@@ -170,7 +162,7 @@ new_subset = subset[[
 
 print("reading nltk")
 
-@st.cache_data
+
 #En funktion för att förbereada...
 def preprocess_text(text, language='english'):
     # Convert list of keywords to a single string and then convert to lowercase
@@ -195,7 +187,6 @@ def preprocess_text(text, language='english'):
     return text
 
 # Apply text preprocessing with stemming
-#new_subset['combined_text'] = new_subset.apply(lambda row: preprocess_text(row['headline'] + ' ' + row['description.text'], language='swedish'), axis=1)
 new_subset['combined_text'] = new_subset.apply(lambda row: preprocess_text((row['headline'] if pd.notnull(row['headline']) else '') + ' ' + (row['description.text'] if pd.notnull(row['description.text']) else ''), language='swedish'), axis=1)
 
 
@@ -204,7 +195,6 @@ vectorizer = TfidfVectorizer(max_features=5000)
 X = vectorizer.fit_transform(new_subset['combined_text'])
 
 # Optimera antalet kluster med elbow method eller silhouette score
-
 
 max_clusters = 10  # Justera detta beroende på dina data
 silhouette_scores = []
@@ -254,8 +244,7 @@ st.markdown(
 )
 
 print("clustering done!")
-#Vår logga
-st.image('logo2.jpg', width=300)  
+
  
 #--------------------------------------------------------------------------------------------------------------------------#
 
@@ -291,7 +280,7 @@ region, form, time, branch = st.columns(4)
 
 
 with region:
-   selected_place = st.selectbox(f'Välj region:', places_list, help="Län i Sverige")
+   selected_place = st.selectbox(f'Välj region:', places_list)
 
 with form:
    selected_time_of_work = st.selectbox(f'Välj anställningsform:', time_of_work)
@@ -330,13 +319,8 @@ else:
     industry_condition = subset['industry'] == selected_industry
 
 # Filtered subset based on all conditions
-filtered_subset = subset[(region_condition) & (time_of_work_condition) & (duration_condition) & (industry_condition)]
-filtered_subset = filtered_subset[['headline', 'employer.workplace', 'number_of_vacancies', 'description.text', 
-                                   'working_hours_type.label', 'workplace_address.region', 
-                                   'workplace_address.municipality', 'duration.label', 'industry']]
-
+filtered_subset = subset[(region_condition) & (time_of_work_condition) & (duration_condition) & (text_condition) & (industry_condition)]
 filtered_subset = filtered_subset.rename(columns=column_aliases) 
-
 
 job_count = filtered_subset.shape[0]
 
@@ -358,57 +342,58 @@ ny_subset = filtered_subset[[
 st.subheader('Lediga jobb')
 
 print("starting with AI answers")
-# Define a function to simplify descriptions using OpenAI API and cache the results
-@st.cache_data
-def simplify_descriptions(descriptions):
-    simplified_descriptions = []
-    for description in descriptions:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
-                {"role": "user", "content": description},
-            ]
-        )
-        simplified_description = response.choices[0].message.content
-        simplified_descriptions.append(simplified_description)
-    return simplified_descriptions
 
-# Batch descriptions and simplify them with optimized API calls
-def process_descriptions(descriptions, batch_size=5):
-    simplified_descriptions = []
-    for i in range(0, len(descriptions), batch_size):
-        batch = descriptions[i:i+batch_size]
-        simplified_batch = simplify_descriptions(batch)
-        simplified_descriptions.extend(simplified_batch)
-    return simplified_descriptions
-
-# Number of job advertisements to display initially
+#antalet jobb
 number = 2 
 temp = st.empty()
 
-# Initial loading of simplified descriptions
-simplified_descriptions = process_descriptions(ny_subset['description.text'].iloc[:number])
-
-# Display the results using simplified descriptions
+#resultaten som visas
 with temp.container():
-    for i in range(number):
+    print("Laddar gpt")
+    for i in range(min(len(ny_subset), number)):
+        print(f'#{i}')
         with st.expander(f"Jobbannons {i+1} - {ny_subset['headline'].iloc[i]}"):
             st.write("-------------------------------------------------")
-            st.write(simplified_descriptions[i])
+            # Anropa OpenAI för att omformulera beskrivningstexten
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": """Du är expert på att skriva snygga jobbannonser 
+                     och alla jobbanonser ska vara skrivna på samma sätt det vill säga med liknande rubriker och innehåll utan listor.
+                     """},
+                    {"role": "user", "content": filtered_subset['description.text'].iloc[i]},
+                ]
+            )
 
-# Load more job advertisements
+            #Hämta och skriv ut den genererade omformulerade beskrivningen
+            for choice in response.choices:
+                simplified_description = choice.message.content
+                st.write(f"{simplified_description}")
+
+
+#visa fler alternativ
 if len(ny_subset) > number:
     if st.button('Visa fler'):
-        temp.clear()  # Clear the previous content
+        temp.empty()
         number += 2
         temp = st.empty()
         with temp.container():
-            simplified_descriptions = process_descriptions(ny_subset['description.text'].iloc[:number])
             for i in range(number - 2, min(len(ny_subset), number)):
                 with st.expander(f"Jobbannons {i+1} - {ny_subset['headline'].iloc[i]}"):
                     st.write("-------------------------------------------------")
-                    st.write(simplified_descriptions[i])
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
+                            {"role": "user", "content": filtered_subset['description.text'].iloc[i]},
+                        ]
+                    )
+
+                    #Hämta och skriv ut den genererade omformulerade beskrivningen
+                    for choice in response.choices:
+                        simplified_description = choice.message.content
+                        st.write(f"{simplified_description}")
+
 
 #--------------------------------------------------------------------------------------------------------------------------#
 
@@ -436,14 +421,11 @@ def preprocess_text_column(column):
     preprocessed_column = []
     for tokens in column_tokens:
         filtered_tokens = [stemmer.stem(token) for token in tokens if token not in swedish_stop_words and len(token) > 2 and token.isalpha()]
-        preprocessed_column.append(' '.join(filtered_tokens))
-    
+        preprocessed_column.append(' '.join(filtered_tokens))  
     return preprocessed_column
-
 
 # Preprocessa texten i kolumnen 'description.text'
 df['stemmed_text'] = preprocess_text_column(df['stemmed_text'])
-
 
 # Funktion för att extrahera viktiga ord från jobbannonser
 def extract_manual_keywords():
@@ -511,12 +493,13 @@ df['prediction'] = model.predict(vectorizer.transform(df['stemmed_text']))
 sorted_df = df.sort_values(by='prediction', ascending=False)
 
 st.markdown("---")
-st.subheader("AI-generator")
-info = """Nedan listar en AI de tre bäst lämpade arbeten för elitidrottare. Dessa förslag har utvecklats utifrån en supervised model som tränats för att ge bästa möjliga rekommendation.
-
-Detta är endast en prototyp och inte en färdigt utvecklad modell."""
+st.subheader("AI-generator", help="Detta är endast en prototyp och inte en färdigt utvecklad modell")
+info = """Nedan listar en AI de tre bäst lämpade arbeten för elitidrottare. 
+Dessa förslag har utvecklats utifrån en supervised model 
+som tränats för att ge bästa möjliga rekommendation."""
 
 st.write(info)
+st.markdown('<br>', unsafe_allow_html=True)
 st.markdown("<h6 style='text-align:left;'>Top tre:</h6>", unsafe_allow_html=True)
 
 
@@ -545,11 +528,12 @@ for i in range(len(top_predictions)):
 
 #--------------------------------------------------------------------------------------------------------------------------#
 
-
 #Panelen längst ner
 st.markdown('<br>', unsafe_allow_html=True)
 st.markdown('<br>', unsafe_allow_html=True)
 
+
+#Tjock linje innan
 st.markdown(
     """
     <style>
