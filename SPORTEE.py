@@ -6,6 +6,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import nltk
 import string
+import pickle
+import os
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -22,10 +24,12 @@ from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 
 
+
+
 #--------------------------------------------------------------------------------------------------------------------------#
 print("Running...")
 #Vår logga
-st.image('logo2.jpg', width=300)  
+st.image('logo2.jpg', width=330)  
 
 #Den gråa sidopanelen
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")
@@ -35,7 +39,13 @@ st.markdown('<br>', unsafe_allow_html=True)
 st.markdown('<br>', unsafe_allow_html=True)
 
 
-om_oss = (f'Vårt projekt arbete hamdlar om... Ett stort problem har upptäckts.... Vill lösa detta... Genom intervjuer etc...')
+om_oss = """Vi på SPORTEE är idrottsentusiaster med ett intresse i entreprenöskap och teknikinovasion där vi delar tron på idrottens kraft att 
+forma både individer och samhällen. Vår passion för idrotten driver oss att utveckla verktyg och resurser som syftar till att hjälpa idrottare 
+att blomstra och skapa inkluderande miljöer inom idrottsföreningar.
+
+
+Vi är övertygade om att varje idrottare förtjänar stöd och möjligheter att nå sin fulla potential, oavsett bakgrund eller nivå.
+"""
 
 vidare_lasning = """
 Rapporten Swedish Elite Sport handlar om de svenska idrottarnas ekonomiska utmaningar, i jämförelse med våra grannar Norge och Danmark. 
@@ -51,28 +61,41 @@ kontakt_uppgifter = """
 Python Consulant 
 Vera Hertzman
 Vera@outlook.com
-+46 76 848 23 49
+
 
 Head of AI 
 Thea Håkansson
 Thea@gmail.se
-+46 73 747 87 45
+
 
 Head of Streamlit 
 Frida Eriksson
 Royal@yahoo.com
-+46 76 432 38 49
+
 
 Project Coordinator 
 Miranda Tham
 Miranda@hotmail.com
-+46 76 767 00 35
+
 
 Agenda and Report Administrator Tove Lennertsson
 Tove@gmail.com
-+46 0000000"""
+"""
 
-bakgrund = """Här kommer info om projektets bakgrund """
+bakgrund = """SPORTEE föddes ur vår gemensamma passion för entreprenörskap, teknikinnovation och idrott. 
+Som studenter med en stark drivkraft för att göra skillnad insåg vi behovet av att förnya stödet till 
+idrottsföreningar i Sverige. Vår erfarenhet och intresse för entreprenörskap och teknik har varit centrala 
+i vår resa. 
+
+Vi har aktivt strävat efter att inte bara erbjuda extrajobb för idrottare, utan även att 
+främja deras övergripande utveckling inom och utanför idrotten.
+Genom att lyssna på och samarbeta med idrottsföreningar har vi fått värdefulla insikter som har varit 
+avgörande för att forma vår plattform. 
+
+Genom noggrann forskning och samråd har vi skapat SPORTEE - 
+en banbrytande applikation som syftar till att revolutionera stödet för idrottsföreningar i Sverige 
+och främja en mer hållbar och inkluderande idrottsmiljö.
+ """
 
 left_column = st.sidebar.container()
 
@@ -141,38 +164,51 @@ print("Almost done!")
 #--------------------------------------------------------------------------------------------------------------------------#
 #CLUSTERING
 
+# Ensure nltk resources are downloaded
+nltk.download('punkt')
+nltk.download('stopwords')
 
-#nltk.download('stopwords')
-#nltk.download('punkt')
+# Paths to save the preprocessed data and models
+STOP_WORDS_SV_PATH = 'stop_words_sv.pkl'
+STOP_WORDS_EN_PATH = 'stop_words_en.pkl'
+STEMMER_SV_PATH = 'stemmer_sv.pkl'
+VECTORIZER_PATH = 'vectorizer.pkl'
+KMEANS_PATH = 'kmeans.pkl'
+PREPROCESSED_TEXT_PATH = 'preprocessed_text.csv'
 
-# Ladda in nltk:s stemmingfunktion för svenska
-stemmer_sv = SnowballStemmer("swedish")
-# Ladda in stoppord för svenska från nltk
-stop_words_sv = set(stopwords.words('swedish'))
-# Ladda in engelska stoppord för att hantera engelska texter
-stop_words_en = set(stopwords.words('english'))
-# Ladda in punktuation från string
+# Load Swedish and English stemmers and stop words if not already saved
+if not os.path.exists(STOP_WORDS_SV_PATH):
+    stop_words_sv = set(stopwords.words('swedish'))
+    with open(STOP_WORDS_SV_PATH, 'wb') as f:
+        pickle.dump(stop_words_sv, f)
+else:
+    with open(STOP_WORDS_SV_PATH, 'rb') as f:
+        stop_words_sv = pickle.load(f)
+
+if not os.path.exists(STOP_WORDS_EN_PATH):
+    stop_words_en = set(stopwords.words('english'))
+    with open(STOP_WORDS_EN_PATH, 'wb') as f:
+        pickle.dump(stop_words_en, f)
+else:
+    with open(STOP_WORDS_EN_PATH, 'rb') as f:
+        stop_words_en = pickle.load(f)
+
+if not os.path.exists(STEMMER_SV_PATH):
+    stemmer_sv = SnowballStemmer("swedish")
+    with open(STEMMER_SV_PATH, 'wb') as f:
+        pickle.dump(stemmer_sv, f)
+else:
+    with open(STEMMER_SV_PATH, 'rb') as f:
+        stemmer_sv = pickle.load(f)
+
 punctuation = set(string.punctuation)
 
-# Select only relevant columns and make a copy to avoid SettingWithCopyWarning
-new_subset = subset[[
-    'headline',
-    'description.text'
-]].copy()
-
-print("reading nltk")
-
-
-#En funktion för att förbereada...
+# Define a function for text preprocessing
 def preprocess_text(text, language='english'):
-    # Convert list of keywords to a single string and then convert to lowercase
     if isinstance(text, list):
         text = ' '.join(text)
-    # Convert text to lowercase
     text = text.lower()
-    # Tokenize the text
     tokens = nltk.word_tokenize(text)
-    # Remove stop words and punctuation based on language
     if language == 'swedish':
         stop_words = stop_words_sv
         stemmer = stemmer_sv
@@ -180,59 +216,77 @@ def preprocess_text(text, language='english'):
         stop_words = stop_words_en
         stemmer = SnowballStemmer("english")
     tokens = [word for word in tokens if word not in stop_words and word not in punctuation]
-    # Stem the tokens
     stemmed_tokens = [stemmer.stem(word) for word in tokens]
-    # Join the stemmed tokens back into a single string
     text = ' '.join(stemmed_tokens)
     return text
 
-# Apply text preprocessing with stemming
-new_subset['combined_text'] = new_subset.apply(lambda row: preprocess_text((row['headline'] if pd.notnull(row['headline']) else '') + ' ' + (row['description.text'] if pd.notnull(row['description.text']) else ''), language='swedish'), axis=1)
+# Function to perform clustering and cache the result
+@st.cache_data
+def perform_clustering(subset, max_clusters=10):
+    silhouette_scores = []
+    if not os.path.exists(PREPROCESSED_TEXT_PATH):
+        new_subset = subset[['headline', 'description.text']].copy()
+        new_subset['combined_text'] = new_subset.apply(lambda row: preprocess_text(
+            (row['headline'] if pd.notnull(row['headline']) else '') + ' ' + 
+            (row['description.text'] if pd.notnull(row['description.text']) else ''), language='swedish'), axis=1)
+        new_subset.to_csv(PREPROCESSED_TEXT_PATH, index=False)
+    else:
+        new_subset = pd.read_csv(PREPROCESSED_TEXT_PATH)
+    
+    if not os.path.exists(VECTORIZER_PATH) or not os.path.exists(KMEANS_PATH):
+        vectorizer = TfidfVectorizer(max_features=5000)
+        X = vectorizer.fit_transform(new_subset['combined_text'])
+
+        for num_clusters in range(2, max_clusters + 1):
+            kmeans = KMeans(n_clusters=num_clusters)
+            kmeans.fit(X)
+            silhouette_scores.append(silhouette_score(X, kmeans.labels_))
+        
+        plt.plot(range(2, max_clusters + 1), silhouette_scores)
+        plt.xlabel('Antal kluster')
+        plt.ylabel('Silhouette Score')
+        plt.title('Silhouette Score för olika antal kluster')
+        plt.show()
+
+        optimal_num_clusters = 7  # Based on the analysis
+        kmeans = KMeans(n_clusters=optimal_num_clusters)
+        kmeans.fit(X)
+
+        # Save the models
+        with open(VECTORIZER_PATH, 'wb') as f:
+            pickle.dump(vectorizer, f)
+        with open(KMEANS_PATH, 'wb') as f:
+            pickle.dump(kmeans, f)
+    else:
+        with open(VECTORIZER_PATH, 'rb') as f:
+            vectorizer = pickle.load(f)
+        with open(KMEANS_PATH, 'rb') as f:
+            kmeans = pickle.load(f)
+
+    X = vectorizer.transform(new_subset['combined_text'])
+    
+    cluster_names = [
+        "Teknologi och IT",
+        "Hälsovård och medicin",
+        "Utbildning och pedagogik",
+        "Ekonomi och finans",
+        "Försäljning och marknadsföring",
+        "Lagerarbete och logistik",
+        "Övrigt"
+    ]
+
+    subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
+
+    return subset, silhouette_scores
+
+# Load your data (make sure to replace this with your actual data loading code)
+# subset = pd.read_csv('your_data.csv')
+
+# Perform clustering
+subset, silhouette_scores = perform_clustering(subset)
 
 
-# Justera vektoriseringen för att använda olika parametrar
-vectorizer = TfidfVectorizer(max_features=5000)
-X = vectorizer.fit_transform(new_subset['combined_text'])
-
-# Optimera antalet kluster med elbow method eller silhouette score
-
-max_clusters = 10  # Justera detta beroende på dina data
-silhouette_scores = []
-for num_clusters in range(2, max_clusters + 1):
-    kmeans = KMeans(n_clusters=num_clusters)
-    kmeans.fit(X)
-    silhouette_scores.append(silhouette_score(X, kmeans.labels_))
-
-# Plotta silhouette score för olika antal kluster
-plt.plot(range(2, max_clusters + 1), silhouette_scores)
-plt.xlabel('Antal kluster')
-plt.ylabel('Silhouette Score')
-plt.title('Silhouette Score för olika antal kluster')
-plt.show()
-
-# Antal kluster, inklusive "Lagerarbete och logistik" och "Övrigt"
-optimal_num_clusters = 7  # Justera detta baserat på din analys
-
-# Använd det optimala antalet kluster för att utföra klustringen
-kmeans = KMeans(n_clusters=optimal_num_clusters)
-kmeans.fit(X)
-
-
-# Manuellt tilldela namn till varje kluster baserat på de framträdande orden eller nyckelorden
-cluster_names = [
-    "Teknologi och IT",
-    "Hälsovård och medicin",
-    "Utbildning och pedagogik",
-    "Ekonomi och finans",
-    "Försäljning och marknadsföring",
-    "Lagerarbete och logistik",
-    "Övrigt"
-]
-
-# Lägg till en ny kolumn i DataFrame för branschnamn
-subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
-
-#Fråga oss pratbubbla
+# Your Streamlit code for displaying the bubble
 st.markdown(
     """
     <div style="position: fixed; bottom: 20px; right: 20px; width: 90px; height: 40px; background-color: rgba(240, 240, 240, 0.8); border-radius: 10px; padding: 10px; display: flex; justify-content: center; align-items: center;">
@@ -242,11 +296,19 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 print("clustering done!")
 
- 
 #--------------------------------------------------------------------------------------------------------------------------#
+cluster_names = [
+        "Teknologi och IT",
+        "Hälsovård och medicin",
+        "Utbildning och pedagogik",
+        "Ekonomi och finans",
+        "Försäljning och marknadsföring",
+        "Lagerarbete och logistik",
+        "Övrigt"
+    ]
+
 
 #Tabell där man kan filtrera med båda rullistorna
 column_aliases = {
@@ -328,7 +390,7 @@ job_count = filtered_subset.shape[0]
 
 #Visar hur många lediga jobba som finns
 st.markdown(f"<h1 style='font-weight: bold; color: #4a90e2'>{job_count} st </h1>", unsafe_allow_html=True)
-st.markdown("Jobb som matchar sökningen:")
+st.markdown(f"<h6 style='font-weight: bold; color: black'>Jobb som matchar sökningen:</h6>", unsafe_allow_html=True)
 
 
 # Välj endast dessa tre kolumner
@@ -338,13 +400,11 @@ ny_subset = filtered_subset[[
     'description.text'
 ]]
 
-# Titel och text högst upp
-st.subheader('Lediga jobb')
 
 print("starting with AI answers")
 
 #antalet jobb
-number = 2 
+number = 5 
 temp = st.empty()
 
 #resultaten som visas
@@ -358,14 +418,16 @@ with temp.container():
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": """Du är expert på att skriva snygga jobbannonser 
-                     och alla jobbanonser ska vara skrivna på samma sätt det vill säga med liknande rubriker och innehåll utan listor.
+                    {"role": "system", "content": """Du är expert på att skriva effektiva och snygga jobbannonser. 
+                    Alla annonser ska vara kortfattade, ha enhetliga rubriker och innehåll. 
+                     Skriv varje jobbannons på detta sätt.
                      """},
-                    {"role": "user", "content": filtered_subset['description.text'].iloc[i]},
+                    {"role": "user", "content": f"Sammanfatta denna annons till max 200 ord: {filtered_subset['description.text'].iloc[i]}"},
                 ]
             )
 
             #Hämta och skriv ut den genererade omformulerade beskrivningen
+            print('GPT SVARAR')
             for choice in response.choices:
                 simplified_description = choice.message.content
                 st.write(f"{simplified_description}")
@@ -375,28 +437,30 @@ with temp.container():
 if len(ny_subset) > number:
     if st.button('Visa fler'):
         temp.empty()
-        number += 2
+        number += 5
         temp = st.empty()
         with temp.container():
-            for i in range(number - 2, min(len(ny_subset), number)):
+            for i in range(number - 5, min(len(ny_subset), number)):
                 with st.expander(f"Jobbannons {i+1} - {ny_subset['headline'].iloc[i]}"):
                     st.write("-------------------------------------------------")
                     response = client.chat.completions.create(
                         model="gpt-3.5-turbo",
                         messages=[
-                            {"role": "system", "content": "Du är expert på att skriva snygga jobbannonser"},
-                            {"role": "user", "content": filtered_subset['description.text'].iloc[i]},
+                            {"role": "system", "content": """Du är expert på att skriva effektiva och snygga jobbannonser. 
+                    Alla annonser ska vara kortfattade, ha enhetliga rubriker och innehåll. 
+                     Skriv varje jobbannons på detta sätt."""},
+                            {"role": "user", "content": f"Sammanfatta denna annons till max 200 ord: {filtered_subset['description.text'].iloc[i]}"},
                         ]
                     )
 
                     #Hämta och skriv ut den genererade omformulerade beskrivningen
+                    print('GPT HAR SVARAT')
                     for choice in response.choices:
                         simplified_description = choice.message.content
                         st.write(f"{simplified_description}")
 
 
 #--------------------------------------------------------------------------------------------------------------------------#
-
 #SUPERVISED LEARNING
 
 # Läs in data
