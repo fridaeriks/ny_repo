@@ -14,7 +14,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
-
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import SnowballStemmer
@@ -22,19 +21,14 @@ from nltk.stem.snowball import SnowballStemmer
 
 from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
-
-
-
-
-#--------------------------------------------------------------------------------------------------------------------------#
 print("Running...")
+
+#----Den gråa sidopanelen----------------------------------------------------------------------------------------------------------------------#
+
 #Vår logga
 st.image('logo2.jpg', width=330)  
-
-#Den gråa sidopanelen
 st.markdown("Det ska vara lätt att hitta jobb för just dig!")
 st.markdown("---")
-
 st.markdown('<br>', unsafe_allow_html=True)
 st.markdown('<br>', unsafe_allow_html=True)
 
@@ -99,7 +93,6 @@ och främja en mer hållbar och inkluderande idrottsmiljö.
 
 left_column = st.sidebar.container()
 
-#Vänstra kolumnen
 left_column.write("""
 <style>
 .left-column {
@@ -113,28 +106,24 @@ left_column.write("""
 
                     #Texten i sidopanelen: annan text som vi kan lägga till
 left_column.markdown("### Vi på <span style='color: #4a90e2;'>SPORTEE</span>", unsafe_allow_html=True)
-                     #left_column.markdown("Info om vårt projekt")
 
-                    #Vidare läsning i sidopanelen
-
+#Om oss                  
 with left_column.expander("💼 Om oss"):
     st.info(om_oss)
 
-# Vidare läsning i sidopanelen
+#Vidare läsning
 with left_column.expander("📖   Vidare läsning"):
     st.info(vidare_lasning)
 
-# Kontaktuppgifter i sidopanelen
+#Kontaktuppgifter
 with left_column.expander("📫   Kontaktuppgifter"):
     st.info(kontakt_uppgifter)
 
-
-# Bakgrund i sidopanelen
+# Bakgrund
 with left_column.expander("📋   Projektets bakgrund"):
     st.info(bakgrund) 
-#--------------------------------------------------------------------------------------------------------------------------#
 
-#API nyckel 
+#--API nyckel------------------------------------------------------------------------------------------------------------------------#
 API_KEY = open('Open_AI_key', 'r').read()
 
 client = OpenAI(
@@ -148,21 +137,18 @@ with open("Open_AI_key", "r") as file:
 # Ange din API-nyckel
 openai.api_key = api_key
 
-#--------------------------------------------------------------------------------------------------------------------------#
+#-----Read the CSV file into a DataFrame-----------------------------------------------------------------------------------------------------------#
 
 @st.cache_data
 def read_csv_file():
-    # Read the CSV file into a DataFrame
     subset = pd.read_csv('subset.csv')
     return subset
 
 # Load data using @st.cache
 subset = read_csv_file()
-
 print("Almost done!")
 
-#--------------------------------------------------------------------------------------------------------------------------#
-#CLUSTERING
+#-----CLUSTERING---------------------------------------------------------------------------------------------------------------------#
 
 # Ensure nltk resources are downloaded
 nltk.download('punkt')
@@ -203,7 +189,7 @@ else:
 
 punctuation = set(string.punctuation)
 
-# Define a function for text preprocessing
+#En funktion som hanterar språket
 def preprocess_text(text, language='english'):
     if isinstance(text, list):
         text = ' '.join(text)
@@ -220,7 +206,7 @@ def preprocess_text(text, language='english'):
     text = ' '.join(stemmed_tokens)
     return text
 
-# Function to perform clustering and cache the result
+#Funktion för klustringen och använd cache Function
 @st.cache_data
 def perform_clustering(subset, max_clusters=10):
     silhouette_scores = []
@@ -276,11 +262,7 @@ def perform_clustering(subset, max_clusters=10):
     ]
 
     subset['industry'] = [cluster_names[label] for label in kmeans.labels_]
-
     return subset, silhouette_scores
-
-# Load your data (make sure to replace this with your actual data loading code)
-# subset = pd.read_csv('your_data.csv')
 
 # Perform clustering
 subset, silhouette_scores = perform_clustering(subset)
@@ -336,11 +318,10 @@ duration_time.insert(0, 'Visa alla')
 # Visa titel 
 st.subheader('Lediga jobb')
 
+#SKAPA SÖKBOXAR
 search_query = st.text_input('Sök efter specifika ord:', value="", help="Jobbtitel, nyckelord eller företag etc",)
 
 region, form, time, branch = st.columns(4)
-
-
 with region:
    selected_place = st.selectbox(f'Välj region:', places_list)
 
@@ -351,7 +332,6 @@ with time:
    selected_duration_time = st.selectbox(f'Välj tidsomfattning', duration_time)
 
 with branch:
-    # Add a selectbox for industry sectors
     selected_industry = st.selectbox("Välj bransch:", ['Visa alla'] + cluster_names)
 
 
@@ -386,7 +366,7 @@ filtered_subset = filtered_subset.rename(columns=column_aliases)
 
 job_count = filtered_subset.shape[0]
 
-#--------------------------------------------------------------------------------------------------------------------------#
+#---BESKRIVNINGAR MED HJÄLP AV AI-------------------------------------------------------------------------------------------------------------#
 
 #Visar hur många lediga jobba som finns
 st.markdown(f"<h1 style='font-weight: bold; color: #4a90e2'>{job_count} st </h1>", unsafe_allow_html=True)
@@ -399,7 +379,6 @@ ny_subset = filtered_subset[[
     'employer.workplace',  
     'description.text'
 ]]
-
 
 print("starting with AI answers")
 
@@ -427,7 +406,6 @@ with temp.container():
             )
 
             #Hämta och skriv ut den genererade omformulerade beskrivningen
-            print('GPT SVARAR')
             for choice in response.choices:
                 simplified_description = choice.message.content
                 st.write(f"{simplified_description}")
@@ -460,8 +438,7 @@ if len(ny_subset) > number:
                         st.write(f"{simplified_description}")
 
 
-#--------------------------------------------------------------------------------------------------------------------------#
-#SUPERVISED LEARNING
+#---SUPERVISED LEARNING----------------------------------------------------------------------------------------------------------------#
 
 # Läs in data
 df = pd.read_csv('subset.csv').head(206)
@@ -564,7 +541,7 @@ som tränats för att ge bästa möjliga rekommendation."""
 
 st.write(info)
 st.markdown('<br>', unsafe_allow_html=True)
-st.markdown("<h6 style='text-align:left;'>Top tre:</h6>", unsafe_allow_html=True)
+st.markdown("<h6 style='text-align:left;'>Top tre resultat:</h6>", unsafe_allow_html=True)
 
 
 top_predictions = sorted_df[['headline','description.text', 'prediction']].head(3)
