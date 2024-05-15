@@ -30,7 +30,7 @@ st.markdown('<br>',unsafe_allow_html=True)
 
 # Funktion för att köra den andra Streamlit-filen
 def run_main_app():
-    subprocess.Popen(["streamlit", "run", "ny_strem.py"])
+    subprocess.Popen(["streamlit", "run", "SPORTEE.py"])
 
 
 st.markdown("<br>", unsafe_allow_html=True)
