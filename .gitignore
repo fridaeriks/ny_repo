@@ -67,3 +67,13 @@ chromatic-build-*.xml
 chromatic-diagnostics.json
 desktop.ini
 test1.py
+
+
+# Pickle (för clustering)
+
+kmeans.pkl
+preprocessed_text.csv
+stemmer_sv.pkl
+stop_words_en.pkl
+stop_words_sv.pkl
+vectorizer.pkl
