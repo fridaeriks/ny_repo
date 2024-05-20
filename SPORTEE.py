@@ -401,7 +401,7 @@ with temp.container():
                     Alla annonser ska vara kortfattade, ha enhetliga rubriker och innehåll. 
                      Skriv varje jobbannons på detta sätt.
                      """},
-                    {"role": "user", "content": f"Sammanfatta denna annons till max 200 ord: {filtered_subset['description.text'].iloc[i]}"},
+                    {"role": "user", "content": f"Sammanfatta denna annons till max 500 ord: {filtered_subset['description.text'].iloc[i]}"},
                 ]
             )
 
@@ -427,7 +427,7 @@ if len(ny_subset) > number:
                             {"role": "system", "content": """Du är expert på att skriva effektiva och snygga jobbannonser. 
                     Alla annonser ska vara kortfattade, ha enhetliga rubriker och innehåll. 
                      Skriv varje jobbannons på detta sätt."""},
-                            {"role": "user", "content": f"Sammanfatta denna annons till max 200 ord: {filtered_subset['description.text'].iloc[i]}"},
+                            {"role": "user", "content": f"Sammanfatta denna annons till max 500 ord: {filtered_subset['description.text'].iloc[i]}"},
                         ]
                     )
 
@@ -581,6 +581,8 @@ st.markdown('<br>', unsafe_allow_html=True)
 
 st.markdown('<br>', unsafe_allow_html=True)
 st.markdown('<br>', unsafe_allow_html=True)
+
+
 
 
 #Tjock linje innan
