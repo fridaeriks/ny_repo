@@ -106,6 +106,7 @@ X_test_vectorized = vectorizer.transform(X_test)
 # Du kan justera viktningen för att passa din specifika situation
 model = LogisticRegression(max_iter=1000, class_weight={'NEJ': 1, 'JA': 10})
 
+
 # Träna modellen
 model.fit(X_train_vectorized, y_train)
 
