@@ -54,26 +54,26 @@ särskilt kvinnor och i de mindre populära idrottsgrenarna, globalt sett lever 
 kontakt_uppgifter = """
 Python Consulant 
 Vera Hertzman
-Vera@outlook.com
+gushertve@student.gu.se
 
 
 Head of AI 
 Thea Håkansson
-Thea@gmail.se
+gushakthb@student.gu.se
 
 
 Head of Streamlit 
 Frida Eriksson
-Royal@yahoo.com
+guserifrbc@student.gu.se
 
 
 Project Coordinator 
 Miranda Tham
-Miranda@hotmail.com
+gusthammi@student.gu.se
 
 
 Agenda and Report Administrator Tove Lennertsson
-Tove@gmail.com
+guslennato@student.gu.se
 """
 
 bakgrund = """SPORTEE föddes ur vår gemensamma passion för entreprenörskap, teknikinnovation och idrott. 
@@ -570,6 +570,15 @@ for i in range(len(top_predictions)):
 #--------------------------------------------------------------------------------------------------------------------------#
 
 #Panelen längst ner
+st.markdown('<br>', unsafe_allow_html=True)
+st.markdown('<br>', unsafe_allow_html=True)
+
+st.markdown('<br>', unsafe_allow_html=True)
+st.markdown('<br>', unsafe_allow_html=True)
+
+st.markdown('<br>', unsafe_allow_html=True)
+st.markdown('<br>', unsafe_allow_html=True)
+
 st.markdown('<br>', unsafe_allow_html=True)
 st.markdown('<br>', unsafe_allow_html=True)
 
