@@ -613,11 +613,11 @@ with safety:
     
 
 with ass:
-    st.markdown("<h6 style='text-align:left;'>För föreingen</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left;'>För föreningen</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Lägg till egen annons</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Ändra layout</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Visa alla jobb</h6>", unsafe_allow_html=True)
-    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Inloggning för förenigar</h6>", unsafe_allow_html=True)
+    st.markdown("<h6 style='text-align:left; font-weight: 500;'>Inloggning för föreningar</h6>", unsafe_allow_html=True)
     st.markdown("<h6 style='text-align:left; font-weight: 500;'>Administrera föreningsannonser</h6>", unsafe_allow_html=True)
 
 
