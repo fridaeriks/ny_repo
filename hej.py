@@ -1,1 +1,0 @@
-print("Vad är de som händer")
